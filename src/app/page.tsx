@@ -126,11 +126,25 @@ export default function QuickPOSPage() {
 
   // Step 1: Customer Details
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>('');
+  const [customerSearchQuery, setCustomerSearchQuery] = useState('');
+  const [isCustomerDropdownOpen, setIsCustomerDropdownOpen] = useState(false);
   const [customerName, setCustomerName] = useState('Walk-in Customer');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerLocation, setCustomerLocation] = useState('Kochi, Kerala');
   const [customerGstin, setCustomerGstin] = useState('');
   const [orderType, setOrderType] = useState<'DELIVERY' | 'PICKUP'>('DELIVERY');
+
+  // Filter registered customers for live search combobox
+  const filteredCustomerList = customers.filter((c) => {
+    const q = customerSearchQuery.toLowerCase();
+    return (
+      c.name.toLowerCase().includes(q) ||
+      (c.phone && c.phone.includes(q)) ||
+      (c.location && c.location.toLowerCase().includes(q)) ||
+      (c.gstin && c.gstin.toLowerCase().includes(q))
+    );
+  });
+
 
   // Step 2: Cart
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -357,26 +371,120 @@ export default function QuickPOSPage() {
             </Link>
           </div>
 
-          {/* Customer Selection Dropdown & Manual Input */}
+          {/* Customer Live Auto-Complete Search & Presets */}
           <div className="space-y-4">
-            <div>
-              <label className="text-xs font-black uppercase text-zinc-800 block mb-2 flex items-center space-x-1.5">
-                <Users className="w-4 h-4 stroke-[1.5]" />
-                <span>Select Registered Customer</span>
-              </label>
-              <select
-                value={selectedCustomerId}
-                onChange={(e) => handleCustomerSelect(e.target.value)}
-                className="w-full bg-zinc-50 text-black font-bold text-sm px-4 py-3.5 rounded-2xl border-2 border-zinc-300 outline-none focus:border-black transition-all"
-              >
-                <option value="">-- Custom / Walk-in Customer --</option>
-                {customers.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name} {c.phone ? `(${c.phone})` : ''} - {c.location}
-                  </option>
-                ))}
-              </select>
+            <div className="relative">
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-xs font-black uppercase text-zinc-800 flex items-center space-x-1.5">
+                  <Search className="w-4 h-4 stroke-[1.5]" />
+                  <span>Search Registered Customer (Type name, phone, or location)</span>
+                </label>
+                {selectedCustomerId && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedCustomerId('');
+                      setCustomerSearchQuery('');
+                      setCustomerName('Walk-in Customer');
+                      setCustomerPhone('');
+                      setCustomerLocation('Kochi, Kerala');
+                      setCustomerGstin('');
+                    }}
+                    className="text-[11px] font-extrabold text-black bg-zinc-100 hover:bg-zinc-200 border border-zinc-300 px-2.5 py-1 rounded-xl transition-all"
+                  >
+                    Reset to Walk-in
+                  </button>
+                )}
+              </div>
+
+              <div className="relative">
+                <input
+                  type="text"
+                  value={customerSearchQuery}
+                  onChange={(e) => {
+                    setCustomerSearchQuery(e.target.value);
+                    setIsCustomerDropdownOpen(true);
+                  }}
+                  onFocus={() => setIsCustomerDropdownOpen(true)}
+                  placeholder="Type to search existing customer (e.g. Abhinav, 98470...)"
+                  className="w-full bg-zinc-50 text-black font-bold text-sm pl-11 pr-4 py-3.5 rounded-2xl border-2 border-zinc-300 outline-none focus:border-black transition-all shadow-inner"
+                />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 stroke-[1.5]" />
+              </div>
+
+              {/* Live Customer Results Dropdown Popup */}
+              {isCustomerDropdownOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setIsCustomerDropdownOpen(false)}
+                  />
+                  <div className="absolute left-0 right-0 mt-2 bg-white border-2 border-black rounded-2xl shadow-2xl z-50 max-h-72 overflow-y-auto divide-y divide-zinc-200">
+                    {/* Quick Presets */}
+                    <div className="p-3 bg-zinc-100 flex flex-wrap gap-2 border-b border-zinc-200">
+                      <span className="text-[10px] font-black uppercase text-zinc-600 w-full block mb-1">
+                        Quick Customer Presets:
+                      </span>
+                      {[
+                        { label: 'Walk-in Customer', loc: 'Kochi, Kerala' },
+                        { label: 'Car Wash', loc: 'Car Washer Bay' },
+                        { label: 'Hotel Laundry', loc: 'Hotel Service' },
+                        { label: 'Staff Payroll', loc: 'Staff Account' },
+                      ].map((preset) => (
+                        <button
+                          key={preset.label}
+                          type="button"
+                          onClick={() => {
+                            setSelectedCustomerId('');
+                            setCustomerName(preset.label);
+                            setCustomerLocation(preset.loc);
+                            setCustomerPhone('');
+                            setCustomerGstin('');
+                            setCustomerSearchQuery(preset.label);
+                            setIsCustomerDropdownOpen(false);
+                          }}
+                          className="px-3 py-1 rounded-xl bg-white border border-black hover:bg-black hover:text-white font-black text-xs transition-all shadow-sm"
+                        >
+                          {preset.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Registered Customers List */}
+                    {filteredCustomerList.length === 0 ? (
+                      <div className="p-4 text-xs font-bold text-zinc-500 text-center">
+                        No registered customer found for "{customerSearchQuery}". Fill in details below to create new.
+                      </div>
+                    ) : (
+                      filteredCustomerList.map((cust) => (
+                        <div
+                          key={cust.id}
+                          onClick={() => {
+                            handleCustomerSelect(cust.id);
+                            setCustomerSearchQuery(cust.name);
+                            setIsCustomerDropdownOpen(false);
+                          }}
+                          className={`p-3.5 hover:bg-zinc-100 cursor-pointer transition-colors flex items-center justify-between ${
+                            selectedCustomerId === cust.id ? 'bg-zinc-100 font-black' : ''
+                          }`}
+                        >
+                          <div>
+                            <p className="font-black text-sm text-black">{cust.name}</p>
+                            <p className="text-xs text-zinc-600 font-semibold">
+                              {cust.phone ? `Ph: ${cust.phone} • ` : ''}{cust.location} {cust.gstin ? `• GSTIN: ${cust.gstin}` : ''}
+                            </p>
+                          </div>
+                          <span className="text-xs font-black px-3 py-1 rounded-full bg-black text-white uppercase tracking-wider">
+                            Select Customer
+                          </span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </>
+              )}
             </div>
+
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div>
