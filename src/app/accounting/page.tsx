@@ -102,10 +102,10 @@ export default function AccountingPage() {
         <div>
           <h1 className="text-2xl font-black text-black tracking-tight flex items-center space-x-3">
             <TrendingUp className="w-7 h-7 text-black stroke-[1.5]" />
-            <span>Accounts & Profit & Loss</span>
+            <span>General Ledger & Accounts</span>
           </h1>
           <p className="text-zinc-500 text-xs font-semibold mt-1">
-            Real-time monthly revenue, expenses, net profit & loss, and double-entry ledger.
+            Real-time revenue, operational expenses, profit & loss summary, and double-entry general ledger.
           </p>
         </div>
 
