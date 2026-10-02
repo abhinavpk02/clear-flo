@@ -8,6 +8,7 @@ import {
   Receipt,
   TrendingUp,
   Users,
+  UserPlus,
   Percent,
   QrCode,
   PackageCheck,
@@ -26,7 +27,7 @@ import {
   Trash2,
   ArrowRight,
 } from 'lucide-react';
-import { formatRupees, calculateKeralaGST, GSTBreakdown } from '@/lib/money';
+import { formatRupees, calculateKeralaGST, GSTBreakdown, toPaise } from '@/lib/money';
 import { getDynamicProductIcon } from '@/lib/iconMapper';
 
 interface Product {
@@ -134,6 +135,17 @@ export default function QuickPOSPage() {
   const [customerGstin, setCustomerGstin] = useState('');
   const [orderType, setOrderType] = useState<'DELIVERY' | 'PICKUP'>('DELIVERY');
 
+  const [savingCustomer, setSavingCustomer] = useState(false);
+  const [customerSaveSuccess, setCustomerSaveSuccess] = useState(false);
+
+  // Quick Add Staff Modal State
+  const [isAddStaffModalOpen, setIsAddStaffModalOpen] = useState(false);
+  const [staffName, setStaffName] = useState('');
+  const [staffRole, setStaffRole] = useState('Production Staff');
+  const [staffPhone, setStaffPhone] = useState('');
+  const [staffSalary, setStaffSalary] = useState('');
+  const [savingStaff, setSavingStaff] = useState(false);
+
   // Filter registered customers for live search combobox
   const filteredCustomerList = customers.filter((c) => {
     const q = customerSearchQuery.toLowerCase();
@@ -144,6 +156,66 @@ export default function QuickPOSPage() {
       (c.gstin && c.gstin.toLowerCase().includes(q))
     );
   });
+
+  const handleQuickSaveCustomer = async () => {
+    if (!customerName || customerName === 'Walk-in Customer' || savingCustomer) return;
+    try {
+      setSavingCustomer(true);
+      const res = await fetch('/api/customers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: customerName,
+          phone: customerPhone,
+          location: customerLocation,
+          gstin: customerGstin,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.id) {
+        setSelectedCustomerId(data.id);
+        setCustomerSaveSuccess(true);
+        fetchCustomers();
+        setTimeout(() => setCustomerSaveSuccess(false), 3000);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSavingCustomer(false);
+    }
+  };
+
+  const handleQuickCreateStaff = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!staffName || savingStaff) return;
+    try {
+      setSavingStaff(true);
+      const res = await fetch('/api/payroll', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'CREATE_EMPLOYEE',
+          name: staffName,
+          role: staffRole,
+          phone: staffPhone,
+          monthlySalaryInPaise: toPaise(staffSalary || '0'),
+        }),
+      });
+      if (res.ok) {
+        setIsAddStaffModalOpen(false);
+        setStaffName('');
+        setStaffSalary('');
+        setStaffPhone('');
+        setCustomerName(`Staff: ${staffName}`);
+        setCustomerLocation('Staff Payroll Account');
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSavingStaff(false);
+    }
+  };
+
 
 
   // Step 2: Cart
@@ -361,14 +433,25 @@ export default function QuickPOSPage() {
               </div>
             </div>
 
-            {/* Customer Directory Link */}
-            <Link
-              href="/customers"
-              className="px-4 py-2 bg-zinc-100 hover:bg-black hover:text-white text-black text-xs font-black rounded-xl border-2 border-zinc-300 transition-colors flex items-center space-x-1.5"
-            >
-              <Users className="w-4 h-4 stroke-[1.5]" />
-              <span>Customer Directory</span>
-            </Link>
+            {/* Customer Directory & Quick Add Buttons */}
+            <div className="flex items-center space-x-2">
+              <button
+                type="button"
+                onClick={() => setIsAddStaffModalOpen(true)}
+                className="px-3.5 py-2 bg-zinc-100 hover:bg-zinc-200 text-black text-xs font-black rounded-xl border-2 border-zinc-300 transition-colors flex items-center space-x-1.5"
+              >
+                <UserPlus className="w-4 h-4 stroke-[1.5]" />
+                <span>+ Add Staff</span>
+              </button>
+
+              <Link
+                href="/customers"
+                className="px-4 py-2 bg-zinc-100 hover:bg-black hover:text-white text-black text-xs font-black rounded-xl border-2 border-zinc-300 transition-colors flex items-center space-x-1.5"
+              >
+                <Users className="w-4 h-4 stroke-[1.5]" />
+                <span>Customer Directory</span>
+              </Link>
+            </div>
           </div>
 
           {/* Customer Live Auto-Complete Search & Presets */}
@@ -542,6 +625,39 @@ export default function QuickPOSPage() {
                   className="w-full bg-zinc-50 text-black font-mono font-bold text-sm px-4 py-3.5 rounded-2xl border-2 border-zinc-300 outline-none focus:border-black transition-all"
                 />
               </div>
+            </div>
+
+            {/* Quick Register / Save Customer Status Row */}
+            <div className="flex flex-wrap items-center justify-between pt-2 border-t border-zinc-200 gap-3">
+              <div className="flex items-center space-x-2">
+                {selectedCustomerId ? (
+                  <span className="text-xs font-black text-black bg-zinc-100 border border-zinc-300 px-3 py-1.5 rounded-xl flex items-center space-x-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-black stroke-[2]" />
+                    <span>Registered Customer Selected</span>
+                  </span>
+                ) : (
+                  <span className="text-xs font-bold text-zinc-500">
+                    Custom details entered above.
+                  </span>
+                )}
+                {customerSaveSuccess && (
+                  <span className="text-xs font-black text-white bg-black px-3 py-1.5 rounded-xl shadow">
+                    ✓ Customer registered in directory!
+                  </span>
+                )}
+              </div>
+
+              {!selectedCustomerId && customerName && customerName !== 'Walk-in Customer' && (
+                <button
+                  type="button"
+                  onClick={handleQuickSaveCustomer}
+                  disabled={savingCustomer}
+                  className="px-4 py-2 bg-black hover:bg-zinc-800 disabled:opacity-40 text-white text-xs font-black rounded-xl shadow flex items-center space-x-1.5 transition-all"
+                >
+                  <UserPlus className="w-4 h-4 stroke-[2]" />
+                  <span>{savingCustomer ? 'Saving...' : 'Register & Save to Customer Directory'}</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -862,7 +978,81 @@ export default function QuickPOSPage() {
             </div>
           </div>
         </div>
-      </div>
+      {/* Quick Add Staff Modal */}
+      {isAddStaffModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-md p-6 rounded-3xl shadow-2xl border-2 border-black bg-white text-black space-y-5">
+            <div className="flex items-center space-x-3 pb-3 border-b-2 border-zinc-200">
+              <div className="w-10 h-10 rounded-2xl bg-black text-white flex items-center justify-center">
+                <UserPlus className="w-6 h-6 stroke-[1.5]" />
+              </div>
+              <h3 className="text-xl font-black">Add New Staff Member</h3>
+            </div>
+
+            <form onSubmit={handleQuickCreateStaff} className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-zinc-600 block mb-1">Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Staff Member Name"
+                  value={staffName}
+                  onChange={(e) => setStaffName(e.target.value)}
+                  className="w-full p-3 rounded-2xl border-2 border-zinc-300 bg-zinc-50 text-black text-xs font-bold outline-none focus:border-black"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-zinc-600 block mb-1">Role / Job Title</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Driver, Production Staff, Washer"
+                  value={staffRole}
+                  onChange={(e) => setStaffRole(e.target.value)}
+                  className="w-full p-3 rounded-2xl border-2 border-zinc-300 bg-zinc-50 text-black text-xs font-bold outline-none focus:border-black"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-zinc-600 block mb-1">Phone Number</label>
+                <input
+                  type="text"
+                  placeholder="+91 Mobile"
+                  value={staffPhone}
+                  onChange={(e) => setStaffPhone(e.target.value)}
+                  className="w-full p-3 rounded-2xl border-2 border-zinc-300 bg-zinc-50 text-black text-xs font-bold outline-none focus:border-black"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-zinc-600 block mb-1">Monthly Base Salary (₹)</label>
+                <input
+                  type="number"
+                  placeholder="e.g. 20000"
+                  value={staffSalary}
+                  onChange={(e) => setStaffSalary(e.target.value)}
+                  className="w-full p-3 rounded-2xl border-2 border-zinc-300 bg-zinc-50 text-black text-xs font-black font-mono outline-none focus:border-black"
+                />
+              </div>
+
+              <div className="flex justify-end space-x-3 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setIsAddStaffModalOpen(false)}
+                  className="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-100 text-black border-2 border-zinc-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingStaff}
+                  className="px-5 py-2.5 rounded-xl bg-black hover:bg-zinc-800 disabled:opacity-40 text-white text-xs font-black shadow"
+                >
+                  {savingStaff ? 'Saving...' : 'Save Staff Member'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
     </div>
   );
 }

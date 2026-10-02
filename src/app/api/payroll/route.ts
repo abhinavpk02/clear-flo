@@ -29,12 +29,15 @@ export async function POST(req: Request) {
 
     if (action === 'CREATE_EMPLOYEE') {
       const { name, role, phone, monthlySalaryInPaise } = body;
+      if (!name) {
+        return NextResponse.json({ error: 'Staff name is required' }, { status: 400 });
+      }
       const emp = await prisma.employee.create({
         data: {
           name,
           role: role || 'Staff',
-          phone,
-          monthlySalaryInPaise: Number(monthlySalaryInPaise),
+          phone: phone || '',
+          monthlySalaryInPaise: Number(monthlySalaryInPaise || 0),
         },
       });
       return NextResponse.json(emp, { status: 201 });
