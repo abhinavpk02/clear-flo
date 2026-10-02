@@ -64,6 +64,7 @@ export default function SettingsPage() {
 
       if (res.ok) {
         setSavedSuccess(true);
+        window.dispatchEvent(new Event('settingsUpdated'));
         setTimeout(() => setSavedSuccess(false), 3000);
       }
     } catch (err) {
@@ -72,6 +73,7 @@ export default function SettingsPage() {
       setSaving(false);
     }
   };
+
 
   if (loading) {
     return <div className="py-20 text-center text-zinc-400 font-bold text-sm">Loading business settings...</div>;

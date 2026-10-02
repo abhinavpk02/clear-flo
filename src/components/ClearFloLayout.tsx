@@ -22,6 +22,26 @@ export default function ClearFloLayout({ children }: { children: React.ReactNode
   const pathname = usePathname();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [settings, setSettings] = useState<{ businessName?: string; businessGstin?: string } | null>(null);
+
+  const fetchSettings = async () => {
+    try {
+      const res = await fetch('/api/settings');
+      const data = await res.json();
+      if (res.ok && data) {
+        setSettings(data);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchSettings();
+    const handleUpdate = () => fetchSettings();
+    window.addEventListener('settingsUpdated', handleUpdate);
+    return () => window.removeEventListener('settingsUpdated', handleUpdate);
+  }, []);
 
   const quickNav = [
     { label: 'Quick POS', href: '/', icon: ShoppingCart, primary: true },
@@ -104,8 +124,12 @@ export default function ClearFloLayout({ children }: { children: React.ReactNode
 
         {/* Sidebar Footer Info */}
         <div className="p-4 m-4 bg-zinc-950 rounded-2xl border border-zinc-900 text-center space-y-1">
-          <p className="text-xs font-black text-zinc-200">ClearFlo Business POS</p>
-          <p className="text-xs text-zinc-400 font-mono font-bold">GSTIN: 32ABCDE1234F1Z5</p>
+          <p className="text-xs font-black text-zinc-200">
+            {settings?.businessName || 'ClearFlo Business POS'}
+          </p>
+          <p className="text-xs text-zinc-400 font-mono font-bold">
+            GSTIN: {settings?.businessGstin || '32ABCDE1234F1Z5'}
+          </p>
         </div>
       </aside>
 
