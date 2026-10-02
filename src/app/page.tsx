@@ -17,6 +17,14 @@ import {
   Truck,
   ShoppingBag,
   Search,
+  User,
+  Phone,
+  MapPin,
+  FileText,
+  CreditCard,
+  Building2,
+  Trash2,
+  ArrowRight,
 } from 'lucide-react';
 import { formatRupees, calculateKeralaGST, GSTBreakdown } from '@/lib/money';
 import { getDynamicProductIcon } from '@/lib/iconMapper';
@@ -37,18 +45,18 @@ interface CartItem {
   quantity: number;
 }
 
-export default function EverloopsPOSDashboardPage() {
+export default function ClearFloPOSDashboardPage() {
   const router = useRouter();
 
-  // 6-Column Desktop Software Modules Navigation
+  // 6-Column Desktop Software Modules Navigation (100% Black & White)
   const modules = [
     {
       id: 'pos',
       title: 'Quick POS',
       href: '/',
       icon: ShoppingCart,
-      primary: true, // Sleek green background
-      desc: 'Instant Billing Terminal',
+      primary: true,
+      desc: 'Instant 1-2-3 POS Terminal',
     },
     {
       id: 'invoices',
@@ -106,12 +114,18 @@ export default function EverloopsPOSDashboardPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
 
-  const [cart, setCart] = useState<CartItem[]>([]);
+  // Step 1: Customer Details
   const [customerName, setCustomerName] = useState('Walk-in Customer');
   const [customerPhone, setCustomerPhone] = useState('');
-  const [customerLocation, setCustomerLocation] = useState('Kalamassery, Kochi');
+  const [customerLocation, setCustomerLocation] = useState('Kochi, Kerala');
+  const [customerGstin, setCustomerGstin] = useState('');
   const [orderType, setOrderType] = useState<'DELIVERY' | 'PICKUP'>('DELIVERY');
-  const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'CASH' | 'BANK_TRANSFER'>('UPI');
+
+  // Step 2: Product Selection / Cart
+  const [cart, setCart] = useState<CartItem[]>([]);
+
+  // Step 3: Checkout / Payment
+  const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'CASH' | 'BANK_TRANSFER' | 'CREDIT'>('UPI');
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -175,6 +189,7 @@ export default function EverloopsPOSDashboardPage() {
         customerName: customerName || 'Walk-in Customer',
         customerPhone,
         customerLocation: customerLocation || 'Local Store',
+        customerGstin,
         orderType,
         paymentMethod,
         items: cart.map((item) => ({
@@ -203,6 +218,13 @@ export default function EverloopsPOSDashboardPage() {
     }
   };
 
+  // Quick Customer Presets
+  const applyPresetCustomer = (preset: { name: string; location: string; gstin?: string }) => {
+    setCustomerName(preset.name);
+    setCustomerLocation(preset.location);
+    if (preset.gstin) setCustomerGstin(preset.gstin);
+  };
+
   const categories = ['ALL', ...Array.from(new Set(products.map((p) => p.category)))];
 
   const filteredProducts = products.filter((p) => {
@@ -214,17 +236,19 @@ export default function EverloopsPOSDashboardPage() {
   });
 
   return (
-    <div className="space-y-8 text-slate-900">
-      {/* 5-6 COLUMN DESKTOP GRID LAYOUT (SOFTWARE MODULES) */}
+    <div className="space-y-8 text-black bg-zinc-50 min-h-screen p-2 sm:p-4">
+      {/* MODULES NAVIGATION (STRICT B&W) */}
       <div className="space-y-3">
         <div className="flex justify-between items-center px-1">
-          <h2 className="text-xs font-extrabold uppercase text-slate-500 tracking-wider">
-            Software Modules & Navigation
+          <h2 className="text-xs font-black uppercase text-zinc-600 tracking-wider">
+            ClearFlo Software Modules & Navigation
           </h2>
-          <span className="text-[11px] font-bold text-zinc-500">ClearFlo POS v2.4</span>
+          <span className="text-xs font-mono font-bold text-black border border-black bg-white px-2 py-0.5 rounded-full">
+            Kerala 18% GST Compliant
+          </span>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
           {modules.map((m) => {
             const Icon = m.icon;
 
@@ -232,26 +256,21 @@ export default function EverloopsPOSDashboardPage() {
               <Link
                 key={m.id}
                 href={m.href}
-                className={`group relative aspect-square p-5 rounded-3xl flex flex-col justify-between items-center text-center transition-all duration-300 shadow-xl ${
+                className={`group relative p-4 rounded-2xl border flex flex-col justify-between items-center text-center transition-all duration-200 ${
                   m.primary
-                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/25 scale-[1.03] ring-4 ring-emerald-600/30'
-                    : 'bg-slate-900 hover:bg-slate-800 text-white shadow-slate-950/40 hover:scale-[1.02]'
+                    ? 'bg-black text-white border-black shadow-lg scale-[1.02]'
+                    : 'bg-white hover:bg-zinc-100 text-black border-zinc-300 shadow-sm hover:border-black'
                 }`}
               >
-                <div className="flex-1 flex items-center justify-center">
-                  <div
-                    className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 ${
-                      m.primary ? 'bg-white/10 text-white' : 'bg-slate-800 text-white'
-                    }`}
-                  >
-                    {/* Strictly Minimal Thin-Line (Outline) Icon */}
-                    <Icon className="w-8 h-8 stroke-[1.5]" />
-                  </div>
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-2 transition-transform group-hover:scale-110 border border-zinc-200 bg-zinc-100 text-black">
+                  <Icon className="w-5 h-5 stroke-[1.5]" />
                 </div>
 
                 <div className="space-y-0.5">
-                  <h3 className="font-extrabold text-sm text-white tracking-tight">{m.title}</h3>
-                  <p className="text-[10px] text-white/70 font-semibold">{m.desc}</p>
+                  <h3 className="font-extrabold text-xs tracking-tight">{m.title}</h3>
+                  <p className={`text-[10px] font-medium ${m.primary ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                    {m.desc}
+                  </p>
                 </div>
               </Link>
             );
@@ -259,22 +278,199 @@ export default function EverloopsPOSDashboardPage() {
         </div>
       </div>
 
-      <hr className="border-slate-200/80" />
+      <hr className="border-zinc-300" />
 
-      {/* POS SELECTION GRID WITH DYNAMIC ICON MAPPING */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* LEFT: Product Catalog Grid (8 Cols) */}
-        <div className="lg:col-span-7 xl:col-span-8 space-y-4">
-          {/* Search & Category Filter Chips */}
-          <div className="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm space-y-3">
-            <div className="relative w-full">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 stroke-[1.5]" />
+      {/* QUICK POS STEP-BY-STEP WORKFLOW: STEP 1 -> STEP 2 -> STEP 3 */}
+      <div className="space-y-6">
+        {/* HEADER BAR */}
+        <div className="flex items-center justify-between bg-black text-white px-6 py-4 rounded-2xl shadow-md">
+          <div className="flex items-center space-x-3">
+            <ShoppingCart className="w-6 h-6 stroke-[1.5]" />
+            <div>
+              <h1 className="font-black text-lg tracking-tight">Quick POS Terminal</h1>
+              <p className="text-xs text-zinc-400">Step-by-step billing: Customer → Product & Quantity → Checkout</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-4 text-xs font-mono font-bold">
+            <span className="bg-zinc-800 text-white px-3 py-1.5 rounded-xl border border-zinc-700">
+              Cart: {cart.length} item{cart.length === 1 ? '' : 's'}
+            </span>
+            <span className="bg-white text-black px-3 py-1.5 rounded-xl font-black">
+              Total: {formatRupees(gst.totalInPaise)}
+            </span>
+          </div>
+        </div>
+
+        {/* STEP 1: SELECT CUSTOMER & ORDER TYPE */}
+        <div className="bg-white border-2 border-black rounded-3xl p-6 shadow-sm space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-zinc-200">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-black text-sm">
+                1
+              </div>
+              <div>
+                <h2 className="font-extrabold text-base text-black flex items-center space-x-2">
+                  <span>Select Customer & Order Details</span>
+                  <User className="w-4 h-4 text-zinc-600 stroke-[1.5]" />
+                </h2>
+                <p className="text-xs text-zinc-500">First step: Enter or pick customer details for the invoice</p>
+              </div>
+            </div>
+
+            {/* Quick Preset Buttons */}
+            <div className="hidden md:flex items-center space-x-2">
+              <span className="text-[10px] uppercase font-bold text-zinc-400">Presets:</span>
+              <button
+                type="button"
+                onClick={() => applyPresetCustomer({ name: 'Walk-in Customer', location: 'Kochi, Kerala' })}
+                className="px-2.5 py-1 bg-zinc-100 hover:bg-black hover:text-white text-black text-xs font-bold rounded-lg border border-zinc-300 transition-colors"
+              >
+                Walk-in
+              </button>
+              <button
+                type="button"
+                onClick={() => applyPresetCustomer({ name: 'Kochi Auto Spares & Wash', location: 'Edapally, Kochi', gstin: '32AAACK1234F1Z1' })}
+                className="px-2.5 py-1 bg-zinc-100 hover:bg-black hover:text-white text-black text-xs font-bold rounded-lg border border-zinc-300 transition-colors"
+              >
+                Car Washer
+              </button>
+              <button
+                type="button"
+                onClick={() => applyPresetCustomer({ name: 'Malabar Grand Hotel Laundry', location: 'MG Road, Ernakulam', gstin: '32BBBGH5678F1Z9' })}
+                className="px-2.5 py-1 bg-zinc-100 hover:bg-black hover:text-white text-black text-xs font-bold rounded-lg border border-zinc-300 transition-colors"
+              >
+                Hotel Laundry
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <label className="text-xs font-black uppercase text-zinc-700 block mb-1 flex items-center space-x-1">
+                <User className="w-3.5 h-3.5 stroke-[1.5]" />
+                <span>Customer Name *</span>
+              </label>
               <input
                 type="text"
-                placeholder="Search car washer, dishwash, floor cleaner, fabric softener..."
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                placeholder="e.g. Walk-in Customer / Business Name"
+                className="w-full bg-zinc-50 text-black font-semibold text-xs px-3.5 py-2.5 rounded-xl border border-zinc-300 outline-none focus:border-black"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-black uppercase text-zinc-700 block mb-1 flex items-center space-x-1">
+                <Phone className="w-3.5 h-3.5 stroke-[1.5]" />
+                <span>Mobile Number</span>
+              </label>
+              <input
+                type="text"
+                value={customerPhone}
+                onChange={(e) => setCustomerPhone(e.target.value)}
+                placeholder="+91 98765 43210"
+                className="w-full bg-zinc-50 text-black font-semibold text-xs px-3.5 py-2.5 rounded-xl border border-zinc-300 outline-none focus:border-black"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-black uppercase text-zinc-700 block mb-1 flex items-center space-x-1">
+                <MapPin className="w-3.5 h-3.5 stroke-[1.5]" />
+                <span>Delivery Location / Address *</span>
+              </label>
+              <input
+                type="text"
+                value={customerLocation}
+                onChange={(e) => setCustomerLocation(e.target.value)}
+                placeholder="e.g. Kalamassery, Kochi"
+                className="w-full bg-zinc-50 text-black font-semibold text-xs px-3.5 py-2.5 rounded-xl border border-zinc-300 outline-none focus:border-black"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-black uppercase text-zinc-700 block mb-1 flex items-center space-x-1">
+                <FileText className="w-3.5 h-3.5 stroke-[1.5]" />
+                <span>GSTIN (Optional)</span>
+              </label>
+              <input
+                type="text"
+                value={customerGstin}
+                onChange={(e) => setCustomerGstin(e.target.value)}
+                placeholder="32ABCDE1234F1Z5"
+                className="w-full bg-zinc-50 text-black font-mono font-semibold text-xs px-3.5 py-2.5 rounded-xl border border-zinc-300 outline-none focus:border-black"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between pt-2">
+            <span className="text-xs font-black uppercase text-zinc-600">Order Fulfillment Type:</span>
+            <div className="flex bg-zinc-100 p-1 rounded-xl border border-zinc-300 space-x-1">
+              <button
+                type="button"
+                onClick={() => setOrderType('DELIVERY')}
+                className={`px-4 py-1.5 rounded-lg font-black text-xs flex items-center space-x-1.5 transition-all ${
+                  orderType === 'DELIVERY'
+                    ? 'bg-black text-white shadow'
+                    : 'text-zinc-600 hover:text-black'
+                }`}
+              >
+                <Truck className="w-4 h-4 stroke-[1.5]" />
+                <span>Delivery Order</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setOrderType('PICKUP')}
+                className={`px-4 py-1.5 rounded-lg font-black text-xs flex items-center space-x-1.5 transition-all ${
+                  orderType === 'PICKUP'
+                    ? 'bg-black text-white shadow'
+                    : 'text-zinc-600 hover:text-black'
+                }`}
+              >
+                <ShoppingBag className="w-4 h-4 stroke-[1.5]" />
+                <span>Store Pickup</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* STEP 2: SELECT PRODUCT & QUANTITY */}
+        <div className="bg-white border-2 border-black rounded-3xl p-6 shadow-sm space-y-5">
+          <div className="flex items-center justify-between pb-3 border-b border-zinc-200">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-black text-sm">
+                2
+              </div>
+              <div>
+                <h2 className="font-extrabold text-base text-black flex items-center space-x-2">
+                  <span>Select Products & Quantity</span>
+                  <PackageCheck className="w-4 h-4 text-zinc-600 stroke-[1.5]" />
+                </h2>
+                <p className="text-xs text-zinc-500">Second step: Click products to add to cart and adjust quantities</p>
+              </div>
+            </div>
+
+            {cart.length > 0 && (
+              <button
+                type="button"
+                onClick={clearCart}
+                className="text-xs font-bold text-zinc-500 hover:text-black flex items-center space-x-1 underline"
+              >
+                <Trash2 className="w-3.5 h-3.5 stroke-[1.5]" />
+                <span>Clear Cart ({cart.length})</span>
+              </button>
+            )}
+          </div>
+
+          {/* Product Search & Category Filters */}
+          <div className="space-y-3">
+            <div className="relative w-full">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 stroke-[1.5]" />
+              <input
+                type="text"
+                placeholder="Search liquid detergent products (car wash, dishwash, floor cleaner, fabric softener...)"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-slate-50 text-slate-900 placeholder-slate-400 text-xs font-semibold pl-11 pr-4 py-3 rounded-2xl border border-slate-200 outline-none focus:border-slate-400 shadow-inner"
+                className="w-full bg-zinc-50 text-black placeholder-zinc-400 text-xs font-semibold pl-11 pr-4 py-3 rounded-2xl border border-zinc-300 outline-none focus:border-black shadow-inner"
               />
             </div>
 
@@ -283,10 +479,10 @@ export default function EverloopsPOSDashboardPage() {
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2 rounded-2xl text-xs font-black whitespace-nowrap transition-all border ${
+                  className={`px-4 py-2 rounded-xl text-xs font-black whitespace-nowrap transition-all border ${
                     selectedCategory === cat
-                      ? 'bg-slate-900 text-white border-slate-900 shadow-md scale-[1.02]'
-                      : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
+                      ? 'bg-black text-white border-black shadow'
+                      : 'bg-zinc-100 text-zinc-700 border-zinc-300 hover:bg-zinc-200'
                   }`}
                 >
                   {cat}
@@ -295,19 +491,18 @@ export default function EverloopsPOSDashboardPage() {
             </div>
           </div>
 
-          {/* POS Product Cards Grid (Dynamic Icon Mapping) */}
+          {/* POS Product Grid with Dynamic Outline Icon Mapping */}
           {loading ? (
-            <div className="py-20 text-center text-slate-400 font-bold text-sm">
-              Loading detergent products...
+            <div className="py-12 text-center text-zinc-500 font-bold text-xs">
+              Loading detergent product catalog...
             </div>
           ) : filteredProducts.length === 0 ? (
-            <div className="bg-white p-12 rounded-3xl border border-slate-200 text-center text-slate-400 font-semibold">
-              No products found matching your search.
+            <div className="bg-zinc-50 p-12 rounded-2xl border border-zinc-300 text-center text-zinc-500 font-medium text-xs">
+              No products found matching &quot;{searchQuery}&quot;.
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
               {filteredProducts.map((product) => {
-                // Dynamically Map Accurate Minimal Icon
                 const DynamicIcon = getDynamicProductIcon(product.name, product.category);
                 const cartItem = cart.find((i) => i.product.id === product.id);
                 const inCartQty = cartItem?.quantity || 0;
@@ -316,180 +511,243 @@ export default function EverloopsPOSDashboardPage() {
                   <div
                     key={product.id}
                     onClick={() => addToCart(product)}
-                    className={`group relative bg-white border rounded-3xl p-5 flex flex-col justify-between items-center text-center cursor-pointer transition-all duration-300 select-none shadow-sm ${
+                    className={`group relative bg-white border-2 rounded-2xl p-4 flex flex-col justify-between items-center text-center cursor-pointer transition-all duration-200 select-none ${
                       inCartQty > 0
-                        ? 'border-emerald-500 ring-2 ring-emerald-500/20 shadow-md scale-[1.02]'
-                        : 'border-slate-200 hover:border-slate-400 hover:shadow-lg hover:scale-[1.02]'
+                        ? 'border-black bg-zinc-50 shadow-md scale-[1.02]'
+                        : 'border-zinc-200 hover:border-black hover:shadow-md'
                     }`}
                   >
                     {/* Quantity Badge */}
                     {inCartQty > 0 && (
-                      <span className="absolute top-3 right-3 bg-emerald-600 text-white font-black text-[10px] px-2.5 py-0.5 rounded-full shadow">
+                      <span className="absolute top-2 right-2 bg-black text-white font-black text-[10px] px-2 py-0.5 rounded-full">
                         {inCartQty} in cart
                       </span>
                     )}
 
-                    {/* TOP: Dynamically mapped accurate minimal icon inside dark rounded square */}
-                    <div className="w-14 h-14 rounded-2xl bg-slate-900 text-white flex items-center justify-center mb-3 transition-transform group-hover:scale-110 shadow-md">
-                      <DynamicIcon className="w-7 h-7 stroke-[1.5]" />
+                    {/* Dynamic Outline Icon */}
+                    <div className="w-12 h-12 rounded-xl bg-black text-white flex items-center justify-center mb-2 transition-transform group-hover:scale-110">
+                      <DynamicIcon className="w-6 h-6 stroke-[1.5]" />
                     </div>
 
-                    {/* MIDDLE: Product Name and Volume */}
-                    <div className="w-full space-y-1 mb-4">
-                      <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block">
+                    {/* Name & Unit */}
+                    <div className="w-full space-y-0.5 mb-3">
+                      <span className="text-[10px] font-black uppercase text-zinc-400 block">
                         {product.unit}
                       </span>
-                      <h3 className="font-extrabold text-xs text-slate-900 leading-snug line-clamp-2 min-h-[2.25rem] flex items-center justify-center">
+                      <h3 className="font-extrabold text-xs text-black leading-tight line-clamp-2 min-h-[2rem]">
                         {product.name}
                       </h3>
                     </div>
 
-                    {/* BOTTOM: Price aligned left, dark slate "+" button aligned right */}
-                    <div className="w-full pt-3 border-t border-slate-100 flex items-center justify-between">
-                      <span className="text-sm font-black font-mono text-slate-900">
+                    {/* Price & Add/Quantity Controls */}
+                    <div className="w-full pt-2 border-t border-zinc-200 flex items-center justify-between">
+                      <span className="text-xs font-black font-mono text-black">
                         {formatRupees(product.priceInPaise)}
                       </span>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          addToCart(product);
-                        }}
-                        className="w-8 h-8 rounded-xl bg-slate-900 hover:bg-slate-800 text-white flex items-center justify-center transition-transform hover:scale-105 shadow-sm"
-                        title="Add to order"
-                      >
-                        <Plus className="w-4 h-4 stroke-[2.5]" />
-                      </button>
+
+                      {inCartQty > 0 ? (
+                        <div className="flex items-center space-x-1" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            type="button"
+                            onClick={() => updateQuantity(product.id, -1)}
+                            className="w-6 h-6 bg-zinc-200 hover:bg-black hover:text-white rounded-md flex items-center justify-center font-bold"
+                          >
+                            <Minus className="w-3 h-3 stroke-[2]" />
+                          </button>
+                          <span className="text-xs font-black font-mono w-4 text-center">{inCartQty}</span>
+                          <button
+                            type="button"
+                            onClick={() => updateQuantity(product.id, 1)}
+                            className="w-6 h-6 bg-zinc-200 hover:bg-black hover:text-white rounded-md flex items-center justify-center font-bold"
+                          >
+                            <Plus className="w-3 h-3 stroke-[2]" />
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            addToCart(product);
+                          }}
+                          className="w-7 h-7 rounded-lg bg-black hover:bg-zinc-800 text-white flex items-center justify-center transition-transform hover:scale-105"
+                          title="Add product"
+                        >
+                          <Plus className="w-4 h-4 stroke-[2]" />
+                        </button>
+                      )}
                     </div>
                   </div>
                 );
               })}
             </div>
           )}
+
+          {/* Selected Products Table Summary */}
+          {cart.length > 0 && (
+            <div className="mt-4 border border-zinc-300 rounded-2xl p-4 bg-zinc-50 space-y-3">
+              <h3 className="font-extrabold text-xs uppercase text-black tracking-wider flex items-center space-x-2">
+                <ShoppingCart className="w-4 h-4 stroke-[1.5]" />
+                <span>Selected Items in Cart ({cart.length})</span>
+              </h3>
+
+              <div className="divide-y divide-zinc-200">
+                {cart.map(({ product, quantity }) => (
+                  <div key={product.id} className="py-2.5 flex items-center justify-between text-xs">
+                    <div className="flex-1 pr-4">
+                      <p className="font-extrabold text-black">{product.name}</p>
+                      <p className="text-[10px] text-zinc-500 font-mono">
+                        Unit: {product.unit} | HSN: {product.hsnCode} | Price: {formatRupees(product.priceInPaise)}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center space-x-4">
+                      <div className="flex items-center space-x-1.5 bg-white px-2 py-1 rounded-xl border border-zinc-300">
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(product.id, -1)}
+                          className="w-5 h-5 bg-zinc-100 hover:bg-black hover:text-white rounded flex items-center justify-center font-bold text-xs"
+                        >
+                          -
+                        </button>
+                        <span className="w-6 text-center font-black font-mono text-xs">{quantity}</span>
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(product.id, 1)}
+                          className="w-5 h-5 bg-zinc-100 hover:bg-black hover:text-white rounded flex items-center justify-center font-bold text-xs"
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      <span className="font-mono font-black text-black text-xs w-20 text-right">
+                        {formatRupees(product.priceInPaise * quantity)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* RIGHT: Quick Order Summary (4 Cols) */}
-        <div className="lg:col-span-5 xl:col-span-4 bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-4">
-          <div className="flex justify-between items-center pb-3 border-b border-slate-100">
-            <h3 className="font-black text-sm text-slate-900 flex items-center space-x-2">
-              <ShoppingCart className="w-4 h-4 text-emerald-600 stroke-[1.5]" />
-              <span>Current Order</span>
-            </h3>
-            <span className="text-xs font-bold text-slate-400">{cart.length} items</span>
-          </div>
-
-          <div className="space-y-2 bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 text-xs">
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="text-[10px] text-slate-400 font-extrabold block mb-1">
-                  Customer
-                </label>
-                <input
-                  type="text"
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full bg-white text-slate-900 px-3 py-1.5 rounded-xl border border-slate-200 font-semibold outline-none focus:border-slate-400"
-                />
+        {/* STEP 3: CHECKOUT & FINAL PAYMENT */}
+        <div className="bg-white border-2 border-black rounded-3xl p-6 shadow-sm space-y-6">
+          <div className="flex items-center justify-between pb-3 border-b border-zinc-200">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-black text-sm">
+                3
               </div>
               <div>
-                <label className="text-[10px] text-slate-400 font-extrabold block mb-1">
-                  Location
-                </label>
-                <input
-                  type="text"
-                  value={customerLocation}
-                  onChange={(e) => setCustomerLocation(e.target.value)}
-                  className="w-full bg-white text-slate-900 px-3 py-1.5 rounded-xl border border-slate-200 font-semibold outline-none focus:border-slate-400"
-                />
+                <h2 className="font-extrabold text-base text-black flex items-center space-x-2">
+                  <span>Checkout & Complete Billing</span>
+                  <CreditCard className="w-4 h-4 text-zinc-600 stroke-[1.5]" />
+                </h2>
+                <p className="text-xs text-zinc-500">Third step: Choose payment method and generate A4 invoice</p>
               </div>
             </div>
 
-            <div className="flex bg-white p-1 rounded-xl border border-slate-200 justify-between items-center mt-2">
-              <button
-                onClick={() => setOrderType('DELIVERY')}
-                className={`flex-1 py-1 rounded-lg font-black text-[11px] flex items-center justify-center space-x-1 ${
-                  orderType === 'DELIVERY'
-                    ? 'bg-emerald-600 text-white shadow'
-                    : 'text-slate-500'
-                }`}
-              >
-                <Truck className="w-3.5 h-3.5 stroke-[1.5]" />
-                <span>Delivery</span>
-              </button>
-              <button
-                onClick={() => setOrderType('PICKUP')}
-                className={`flex-1 py-1 rounded-lg font-black text-[11px] flex items-center justify-center space-x-1 ${
-                  orderType === 'PICKUP'
-                    ? 'bg-emerald-600 text-white shadow'
-                    : 'text-slate-500'
-                }`}
-              >
-                <ShoppingBag className="w-3.5 h-3.5 stroke-[1.5]" />
-                <span>Pickup</span>
-              </button>
+            <div className="text-right font-mono">
+              <span className="text-[10px] uppercase font-bold text-zinc-500 block">Final Bill Total:</span>
+              <span className="text-lg font-black text-black">{formatRupees(gst.totalInPaise)}</span>
             </div>
           </div>
 
-          {/* Cart Item Rows */}
-          <div className="max-h-48 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
-            {cart.length === 0 ? (
-              <div className="py-8 text-center text-slate-400 text-xs font-semibold">
-                Tap product cards to add detergent items to cart.
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+            {/* Left: Payment Method Choice */}
+            <div className="space-y-3">
+              <label className="text-xs font-black uppercase text-black block">
+                Payment Method:
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { id: 'UPI', label: 'UPI / QR Payment', icon: QrCode },
+                  { id: 'CASH', label: 'Cash Payment', icon: BanknoteIcon },
+                  { id: 'BANK_TRANSFER', label: 'Bank Transfer', icon: Building2 },
+                  { id: 'CREDIT', label: 'Customer Credit', icon: CreditCard },
+                ].map((pm) => {
+                  const Icon = pm.icon;
+                  return (
+                    <button
+                      key={pm.id}
+                      type="button"
+                      onClick={() => setPaymentMethod(pm.id as any)}
+                      className={`p-3.5 rounded-xl border-2 font-bold text-xs flex items-center space-x-2 justify-start transition-all ${
+                        paymentMethod === pm.id
+                          ? 'bg-black text-white border-black shadow'
+                          : 'bg-zinc-50 text-black border-zinc-300 hover:border-black'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4 stroke-[1.5]" />
+                      <span>{pm.label}</span>
+                    </button>
+                  );
+                })}
               </div>
-            ) : (
-              cart.map(({ product, quantity }) => (
-                <div
-                  key={product.id}
-                  className="flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-slate-200 text-xs"
-                >
-                  <div className="flex-1 pr-2">
-                    <p className="font-extrabold text-slate-900 truncate">{product.name}</p>
-                    <p className="text-[10px] text-slate-500 font-mono">
-                      {formatRupees(product.priceInPaise)} × {quantity}
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-1.5 bg-white p-1 rounded-xl border border-slate-200">
-                    <button
-                      onClick={() => updateQuantity(product.id, -1)}
-                      className="w-6 h-6 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg flex items-center justify-center font-black"
-                    >
-                      <Minus className="w-3.5 h-3.5 stroke-[2]" />
-                    </button>
-                    <span className="w-5 text-center font-black text-emerald-600 text-xs">
-                      {quantity}
-                    </span>
-                    <button
-                      onClick={() => updateQuantity(product.id, 1)}
-                      className="w-6 h-6 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg flex items-center justify-center font-black"
-                    >
-                      <Plus className="w-3.5 h-3.5 stroke-[2]" />
-                    </button>
-                  </div>
-                  <span className="font-black font-mono text-slate-900 ml-3 text-right">
-                    {formatRupees(product.priceInPaise * quantity)}
-                  </span>
-                </div>
-              ))
-            )}
-          </div>
-
-          {/* Checkout Breakdown */}
-          <div className="pt-3 border-t border-slate-100 space-y-2 text-xs">
-            <div className="flex justify-between font-black text-sm text-slate-900">
-              <span>Total (18% Kerala GST)</span>
-              <span className="font-mono text-emerald-600">{formatRupees(gst.totalInPaise)}</span>
             </div>
-            <button
-              onClick={handleCheckout}
-              disabled={cart.length === 0 || submitting}
-              className="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center space-x-2"
-            >
-              <CheckCircle2 className="w-4 h-4 stroke-[2]" />
-              <span>Checkout & Print A4</span>
-            </button>
+
+            {/* Right: Bill Breakdown & Action Button */}
+            <div className="bg-zinc-50 p-4 rounded-2xl border border-zinc-300 space-y-3 text-xs">
+              <div className="flex justify-between text-zinc-600">
+                <span>Items Subtotal:</span>
+                <span className="font-mono font-bold text-black">{formatRupees(gst.subtotalInPaise)}</span>
+              </div>
+              <div className="flex justify-between text-zinc-600">
+                <span>CGST (9% Kerala):</span>
+                <span className="font-mono font-bold text-black">{formatRupees(gst.cgstInPaise)}</span>
+              </div>
+              <div className="flex justify-between text-zinc-600">
+                <span>SGST (9% Kerala):</span>
+                <span className="font-mono font-bold text-black">{formatRupees(gst.sgstInPaise)}</span>
+              </div>
+              <hr className="border-zinc-300" />
+              <div className="flex justify-between font-black text-base text-black">
+                <span>Total Amount Due:</span>
+                <span className="font-mono">{formatRupees(gst.totalInPaise)}</span>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleCheckout}
+                disabled={cart.length === 0 || submitting}
+                className="w-full py-4 rounded-xl bg-black hover:bg-zinc-800 disabled:opacity-30 text-white font-black text-xs uppercase tracking-wider shadow-lg transition-all flex items-center justify-center space-x-2 mt-4"
+              >
+                <CheckCircle2 className="w-5 h-5 stroke-[1.5]" />
+                <span>{submitting ? 'Processing Invoice...' : 'Complete Checkout & Print A4 Invoice'}</span>
+                <ArrowRight className="w-4 h-4 stroke-[1.5]" />
+              </button>
+
+              {cart.length === 0 && (
+                <p className="text-[11px] text-center text-zinc-500 font-bold">
+                  ⚠️ Please add at least one product in Step 2 to enable checkout.
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+// Fallback icon for Cash Payment
+function BanknoteIcon(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect width="20" height="12" x="2" y="6" rx="2" />
+      <circle cx="12" cy="12" r="2" />
+      <path d="M6 12h.01M18 12h.01" />
+    </svg>
   );
 }
