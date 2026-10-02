@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../src/lib/db';
 
 async function main() {
   console.log('Seeding initial products with Car Wash, Dish Wash, Floor Cleaner, Hand Wash, Fabric, and Laundry...');
