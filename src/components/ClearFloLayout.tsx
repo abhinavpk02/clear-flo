@@ -49,30 +49,30 @@ export default function ClearFloLayout({ children }: { children: React.ReactNode
 
   return (
     <div className="min-h-screen bg-white font-sans flex text-black">
-      {/* FIXED LEFT SIDEBAR (Pure Black Background) */}
-      <aside className="w-64 bg-black text-white flex flex-col justify-between fixed inset-y-0 left-0 z-40 border-r border-zinc-900 shadow-2xl">
+      {/* FIXED LEFT SIDEBAR (Sized Up & Perfectly Aligned) */}
+      <aside className="w-72 bg-black text-white flex flex-col justify-between fixed inset-y-0 left-0 z-40 border-r border-zinc-900 shadow-2xl">
         <div className="p-6 space-y-8">
           {/* Logo Header: Bold White "ClearFlo" */}
-          <Link href="/" className="flex items-center space-x-3 group block">
-            <div className="w-10 h-10 rounded-xl bg-white text-black flex items-center justify-center font-black shadow group-hover:scale-105 transition-transform">
-              <Droplet className="w-6 h-6 stroke-[1.5]" />
+          <Link href="/" className="flex items-center space-x-3.5 group block">
+            <div className="w-12 h-12 rounded-2xl bg-white text-black flex items-center justify-center font-black shadow-lg group-hover:scale-105 transition-transform">
+              <Droplet className="w-7 h-7 stroke-[1.5]" />
             </div>
             <div>
-              <h1 className="font-extrabold text-xl tracking-tight text-white font-sans">
+              <h1 className="font-black text-2xl tracking-tight text-white font-sans">
                 ClearFlo
               </h1>
-              <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider block -mt-1">
+              <span className="text-xs text-zinc-400 font-bold uppercase tracking-wider block -mt-0.5">
                 Detergent POS & Tax
               </span>
             </div>
           </Link>
 
           {/* Vertical Quick Access Tabs */}
-          <div className="space-y-1.5">
-            <span className="text-[10px] font-extrabold uppercase text-zinc-500 tracking-wider block px-3 mb-2">
+          <div className="space-y-2">
+            <span className="text-xs font-black uppercase text-zinc-500 tracking-wider block px-3 mb-2">
               Quick Access
             </span>
-            <nav className="space-y-1">
+            <nav className="space-y-1.5">
               {quickNav.map((item) => {
                 const Icon = item.icon;
                 const isActive =
@@ -84,15 +84,15 @@ export default function ClearFloLayout({ children }: { children: React.ReactNode
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs font-bold transition-all duration-200 ${
+                    className={`flex items-center space-x-3.5 px-4 py-3.5 rounded-2xl text-sm font-bold transition-all duration-200 ${
                       isActive && item.primary
-                        ? 'bg-white text-black font-black shadow-md'
+                        ? 'bg-white text-black font-black shadow-lg scale-[1.02]'
                         : isActive
-                        ? 'bg-zinc-900 text-white border-l-4 border-white pl-2.5 font-extrabold'
+                        ? 'bg-zinc-900 text-white border-l-4 border-white pl-3 font-extrabold'
                         : 'text-zinc-400 hover:bg-zinc-900 hover:text-white'
                     }`}
                   >
-                    <Icon className="w-4 h-4 stroke-[1.5] shrink-0" />
+                    <Icon className="w-5 h-5 stroke-[1.5] shrink-0" />
                     <span className="truncate">{item.label}</span>
                   </Link>
                 );
@@ -102,51 +102,51 @@ export default function ClearFloLayout({ children }: { children: React.ReactNode
         </div>
 
         {/* Sidebar Footer Info */}
-        <div className="p-4 m-4 bg-zinc-950 rounded-xl border border-zinc-900 text-center space-y-1">
-          <p className="text-[11px] font-bold text-zinc-300">ClearFlo Liquid Detergents</p>
-          <p className="text-[10px] text-zinc-500 font-mono">Kerala GST: 32ABCDE1234F1Z5</p>
+        <div className="p-4 m-4 bg-zinc-950 rounded-2xl border border-zinc-900 text-center space-y-1">
+          <p className="text-xs font-black text-zinc-200">ClearFlo Liquid Detergents</p>
+          <p className="text-xs text-zinc-400 font-mono font-bold">Kerala GST: 32ABCDE1234F1Z5</p>
         </div>
       </aside>
 
       {/* MAIN CONTENT AREA */}
-      <div className="flex-1 pl-64 flex flex-col min-h-screen">
-        {/* HEADER BAR (Pure White with Crisp Black Border) */}
-        <header className="h-20 bg-white border-b border-zinc-200 px-8 flex items-center justify-between sticky top-0 z-30">
+      <div className="flex-1 pl-72 flex flex-col min-h-screen">
+        {/* HEADER BAR (Sized Up & Aligned) */}
+        <header className="h-20 bg-white border-b-2 border-zinc-200 px-8 flex items-center justify-between sticky top-0 z-30">
           {/* Top Left: Notification Bell Icon + Dropdown */}
           <div className="relative">
             <button
               onClick={() => setIsNotifOpen(!isNotifOpen)}
-              className="relative p-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-black transition-colors border border-zinc-300"
+              className="relative p-3 rounded-2xl bg-zinc-100 hover:bg-zinc-200 text-black transition-colors border-2 border-zinc-300"
               title="Notifications"
             >
               <Bell className="w-5 h-5 stroke-[1.5]" />
-              <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-black ring-2 ring-white" />
+              <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full bg-black ring-2 ring-white" />
             </button>
 
-            {/* Notification Dropdown Mockup */}
+            {/* Notification Dropdown */}
             {isNotifOpen && (
-              <div className="absolute left-0 mt-3 w-80 bg-white border border-zinc-300 rounded-2xl shadow-2xl p-4 z-50 space-y-3 text-black">
-                <div className="flex justify-between items-center pb-2 border-b border-zinc-100">
-                  <span className="font-extrabold text-xs text-black uppercase tracking-wider">
+              <div className="absolute left-0 mt-3 w-88 bg-white border-2 border-black rounded-3xl shadow-2xl p-5 z-50 space-y-4 text-black">
+                <div className="flex justify-between items-center pb-2 border-b border-zinc-200">
+                  <span className="font-black text-xs text-black uppercase tracking-wider">
                     Alerts & Notifications
                   </span>
-                  <span className="text-[10px] font-bold text-white bg-black px-2 py-0.5 rounded-full">
+                  <span className="text-xs font-bold text-white bg-black px-2.5 py-0.5 rounded-full">
                     2 Active
                   </span>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   {notifications.map((n) => (
                     <div
                       key={n.id}
-                      className="p-3 bg-zinc-50 hover:bg-zinc-100 rounded-xl border border-zinc-200 text-xs space-y-1 transition-colors"
+                      className="p-3.5 bg-zinc-50 hover:bg-zinc-100 rounded-2xl border border-zinc-300 text-xs space-y-1.5 transition-colors"
                     >
-                      <div className="flex items-center space-x-1.5">
-                        <AlertTriangle className="w-3.5 h-3.5 text-black stroke-[1.5]" />
-                        <span className="font-extrabold text-black">{n.title}</span>
+                      <div className="flex items-center space-x-2">
+                        <AlertTriangle className="w-4 h-4 text-black stroke-[1.5]" />
+                        <span className="font-extrabold text-black text-xs">{n.title}</span>
                       </div>
-                      <p className="text-zinc-600 text-[11px] leading-snug">{n.desc}</p>
-                      <span className="text-[9px] text-zinc-400 font-bold block text-right">
+                      <p className="text-zinc-600 text-xs leading-snug">{n.desc}</p>
+                      <span className="text-[10px] text-zinc-400 font-bold block text-right">
                         {n.time}
                       </span>
                     </div>
@@ -159,32 +159,32 @@ export default function ClearFloLayout({ children }: { children: React.ReactNode
           {/* Center: Wide White Pill-Shaped Search Bar */}
           <div className="flex-1 max-w-xl mx-8">
             <div className="relative w-full">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 stroke-[1.5]" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 stroke-[1.5]" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search Modules or Customers"
-                className="w-full bg-white text-black placeholder-zinc-400 text-xs font-semibold pl-11 pr-4 py-3 rounded-full border border-zinc-300 shadow-sm focus:outline-none focus:border-black transition-all"
+                placeholder="Search Modules or Customers..."
+                className="w-full bg-white text-black placeholder-zinc-400 text-sm font-semibold pl-12 pr-4 py-3 rounded-full border-2 border-zinc-300 shadow-sm focus:outline-none focus:border-black transition-all"
               />
             </div>
           </div>
 
-          {/* Top Right: Refresh Icon & Logout Text Link */}
-          <div className="flex items-center space-x-4">
+          {/* Top Right: Refresh Icon & Logout Link */}
+          <div className="flex items-center space-x-5">
             <button
               onClick={() => window.location.reload()}
-              className="p-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-black transition-colors border border-zinc-300"
+              className="p-3 rounded-2xl bg-zinc-100 hover:bg-zinc-200 text-black transition-colors border-2 border-zinc-300"
               title="Refresh System"
             >
-              <RotateCw className="w-4 h-4 stroke-[1.5]" />
+              <RotateCw className="w-5 h-5 stroke-[1.5]" />
             </button>
 
             <Link
               href="/"
-              className="flex items-center space-x-1.5 text-xs font-extrabold text-black hover:text-zinc-600 transition-colors"
+              className="flex items-center space-x-2 text-sm font-black text-black hover:text-zinc-600 transition-colors"
             >
-              <LogOut className="w-4 h-4 stroke-[1.5]" />
+              <LogOut className="w-5 h-5 stroke-[1.5]" />
               <span>Logout</span>
             </Link>
           </div>
