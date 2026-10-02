@@ -1,0 +1,124 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+model Product {
+  id           String   @id @default(uuid())
+  name         String
+  category     String   @default("Liquid Detergent")
+  unit         String   @default("5L")
+  priceInPaise Int      // e.g. 45000 paise = Rs. 450.00
+  stock        Int      @default(100)
+  hsnCode      String   @default("3402")
+  iconName     String   @default("Sparkles")
+  description  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Customer {
+  id             String   @id @default(uuid())
+  name           String
+  phone          String
+  location       String
+  gstin          String?
+  balanceInPaise Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Invoice {
+  id               String        @id @default(uuid())
+  invoiceNumber    String        @unique
+  date             DateTime      @default(now())
+  customerName     String
+  customerPhone    String?
+  customerLocation  String
+  customerGstin    String?
+  orderType        String        @default("DELIVERY") // DELIVERY or PICKUP
+  paymentMethod    String        @default("UPI")      // UPI, CASH, BANK_TRANSFER, CREDIT
+  paymentStatus    String        @default("PAID")     // PAID, PENDING, PARTIAL
+  subtotalInPaise  Int
+  cgstInPaise      Int           // 9%
+  sgstInPaise      Int           // 9%
+  totalInPaise     Int
+  notes            String?
+  items            InvoiceItem[]
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+}
+
+model InvoiceItem {
+  id               String   @id @default(uuid())
+  invoiceId        String
+  invoice          Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  productId        String?
+  productName      String
+  unit             String
+  unitPriceInPaise Int
+  quantity         Int
+  totalInPaise     Int
+}
+
+model LedgerEntry {
+  id            String   @id @default(uuid())
+  date          DateTime @default(now())
+  type          String   // INCOME or EXPENSE
+  category      String   // SALES, RAW_MATERIAL, SALARY, DELIVERY, UTILITIES, OTHER
+  amountInPaise Int
+  description   String
+  invoiceId     String?
+  createdAt     DateTime @default(now())
+}
+
+model Employee {
+  id                   String              @id @default(uuid())
+  name                 String
+  role                 String              @default("Staff")
+  phone                String
+  monthlySalaryInPaise Int
+  dateJoined           DateTime            @default(now())
+  attendances          Attendance[]
+  salaryTransactions   SalaryTransaction[]
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+}
+
+model Attendance {
+  id         String   @id @default(uuid())
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  date       DateTime
+  status     String   // PRESENT, ABSENT, HALF_DAY
+  createdAt  DateTime @default(now())
+}
+
+model SalaryTransaction {
+  id            String   @id @default(uuid())
+  employeeId    String
+  employee      Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  date          DateTime @default(now())
+  type          String   // PAYMENT, ADVANCE, DEDUCTION
+  amountInPaise Int
+  note          String?
+  createdAt     DateTime @default(now())
+}
+
+model Settings {
+  id              String  @id @default("default")
+  businessName    String  @default("ClearFlo Liquid Detergents")
+  businessAddress String  @default("Industrial Estate, Kochi, Kerala - 682024")
+  businessPhone   String  @default("+91 98765 43210")
+  businessGstin   String  @default("32ABCDE1234F1Z5")
+  bankName        String? @default("State Bank of India")
+  accountNo       String? @default("123456789012")
+  ifscCode        String? @default("SBIN0001234")
+  upiId           String? @default("clearflo@upi")
+  qrCodeImage     String? @default("https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=clearflo@upi&pn=ClearFlo%20Detergents")
+}
