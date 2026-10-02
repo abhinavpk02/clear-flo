@@ -26,6 +26,7 @@ export default function ClearFloLayout({ children }: { children: React.ReactNode
   const quickNav = [
     { label: 'Quick POS', href: '/', icon: ShoppingCart, primary: true },
     { label: 'A4 Invoices', href: '/invoices', icon: Receipt },
+    { label: 'Customers', href: '/customers', icon: Users },
     { label: 'Staff Payroll', href: '/payroll', icon: Users },
     { label: 'Stock Update', href: '/stock', icon: PackageCheck },
     { label: 'Ledger & Accounts', href: '/accounting', icon: TrendingUp },

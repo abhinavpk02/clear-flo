@@ -40,12 +40,21 @@ interface Product {
   iconName: string;
 }
 
+interface Customer {
+  id: string;
+  name: string;
+  phone: string;
+  location: string;
+  gstin?: string;
+  balanceInPaise: number;
+}
+
 interface CartItem {
   product: Product;
   quantity: number;
 }
 
-export default function StandardizedPOSDashboardPage() {
+export default function QuickPOSPage() {
   const router = useRouter();
 
   // Navigation Modules (Standardized)
@@ -67,12 +76,12 @@ export default function StandardizedPOSDashboardPage() {
       desc: 'Sales & GST Bills',
     },
     {
-      id: 'accounts',
-      title: 'Ledger & Accounts',
-      href: '/accounting',
-      icon: TrendingUp,
+      id: 'customers',
+      title: 'Customers',
+      href: '/customers',
+      icon: Users,
       primary: false,
-      desc: 'Profit & Loss',
+      desc: 'Customer Accounts',
     },
     {
       id: 'payroll',
@@ -83,22 +92,6 @@ export default function StandardizedPOSDashboardPage() {
       desc: 'Salaries & Attendance',
     },
     {
-      id: 'tax',
-      title: 'Tax & GST',
-      href: '/settings',
-      icon: Percent,
-      primary: false,
-      desc: '18% GST Compliance',
-    },
-    {
-      id: 'qr',
-      title: 'QR Payments',
-      href: '/settings',
-      icon: QrCode,
-      primary: false,
-      desc: 'UPI Payment QR',
-    },
-    {
       id: 'stock',
       title: 'Stock Update',
       href: '/stock',
@@ -106,15 +99,33 @@ export default function StandardizedPOSDashboardPage() {
       primary: false,
       desc: 'Inventory Control',
     },
+    {
+      id: 'accounts',
+      title: 'Ledger & Accounts',
+      href: '/accounting',
+      icon: TrendingUp,
+      primary: false,
+      desc: 'Profit & Loss',
+    },
+    {
+      id: 'settings',
+      title: 'Settings',
+      href: '/settings',
+      icon: SettingsIcon,
+      primary: false,
+      desc: 'System Config',
+    },
   ];
 
   // POS State
   const [products, setProducts] = useState<Product[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
 
-  // Step 1: Customer
+  // Step 1: Customer Details
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>('');
   const [customerName, setCustomerName] = useState('Walk-in Customer');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerLocation, setCustomerLocation] = useState('Kochi, Kerala');
@@ -130,6 +141,7 @@ export default function StandardizedPOSDashboardPage() {
 
   useEffect(() => {
     fetchProducts();
+    fetchCustomers();
   }, []);
 
   const fetchProducts = async () => {
@@ -137,13 +149,34 @@ export default function StandardizedPOSDashboardPage() {
       setLoading(true);
       const res = await fetch('/api/products');
       const data = await res.json();
-      if (Array.isArray(data)) {
-        setProducts(data);
-      }
+      if (Array.isArray(data)) setProducts(data);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCustomers = async () => {
+    try {
+      const res = await fetch('/api/customers');
+      const data = await res.json();
+      if (Array.isArray(data)) setCustomers(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Handle Customer Selection Dropdown
+  const handleCustomerSelect = (customerId: string) => {
+    setSelectedCustomerId(customerId);
+    if (!customerId) return;
+    const cust = customers.find((c) => c.id === customerId);
+    if (cust) {
+      setCustomerName(cust.name);
+      setCustomerPhone(cust.phone || '');
+      setCustomerLocation(cust.location || '');
+      setCustomerGstin(cust.gstin || '');
     }
   };
 
@@ -216,12 +249,6 @@ export default function StandardizedPOSDashboardPage() {
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const applyPresetCustomer = (preset: { name: string; location: string; gstin?: string }) => {
-    setCustomerName(preset.name);
-    setCustomerLocation(preset.location);
-    if (preset.gstin) setCustomerGstin(preset.gstin);
   };
 
   const categories = ['ALL', ...Array.from(new Set(products.map((p) => p.category)))];
@@ -316,92 +343,97 @@ export default function StandardizedPOSDashboardPage() {
                   <span>Customer Details</span>
                   <User className="w-5 h-5 text-zinc-600 stroke-[1.5]" />
                 </h2>
-                <p className="text-sm text-zinc-500 font-medium">Select or enter customer details</p>
+                <p className="text-sm text-zinc-500 font-medium">Select registered customer or enter details</p>
               </div>
             </div>
 
-            {/* Presets */}
-            <div className="hidden lg:flex items-center space-x-2">
-              <span className="text-xs uppercase font-black text-zinc-400">Presets:</span>
-              <button
-                type="button"
-                onClick={() => applyPresetCustomer({ name: 'Walk-in Customer', location: 'Kochi, Kerala' })}
-                className="px-3.5 py-1.5 bg-zinc-100 hover:bg-black hover:text-white text-black text-xs font-black rounded-xl border-2 border-zinc-300 transition-colors"
-              >
-                Walk-in
-              </button>
-              <button
-                type="button"
-                onClick={() => applyPresetCustomer({ name: 'Kochi Auto Spares & Wash', location: 'Edapally, Kochi', gstin: '32AAACK1234F1Z1' })}
-                className="px-3.5 py-1.5 bg-zinc-100 hover:bg-black hover:text-white text-black text-xs font-black rounded-xl border-2 border-zinc-300 transition-colors"
-              >
-                Car Washer
-              </button>
-              <button
-                type="button"
-                onClick={() => applyPresetCustomer({ name: 'Malabar Grand Hotel Laundry', location: 'MG Road, Ernakulam', gstin: '32BBBGH5678F1Z9' })}
-                className="px-3.5 py-1.5 bg-zinc-100 hover:bg-black hover:text-white text-black text-xs font-black rounded-xl border-2 border-zinc-300 transition-colors"
-              >
-                Hotel Laundry
-              </button>
-            </div>
+            {/* Customer Directory Link */}
+            <Link
+              href="/customers"
+              className="px-4 py-2 bg-zinc-100 hover:bg-black hover:text-white text-black text-xs font-black rounded-xl border-2 border-zinc-300 transition-colors flex items-center space-x-1.5"
+            >
+              <Users className="w-4 h-4 stroke-[1.5]" />
+              <span>Customer Directory</span>
+            </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Customer Selection Dropdown & Manual Input */}
+          <div className="space-y-4">
             <div>
               <label className="text-xs font-black uppercase text-zinc-800 block mb-2 flex items-center space-x-1.5">
-                <User className="w-4 h-4 stroke-[1.5]" />
-                <span>Customer Name *</span>
+                <Users className="w-4 h-4 stroke-[1.5]" />
+                <span>Select Registered Customer</span>
               </label>
-              <input
-                type="text"
-                value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
-                placeholder="Customer or Company Name"
+              <select
+                value={selectedCustomerId}
+                onChange={(e) => handleCustomerSelect(e.target.value)}
                 className="w-full bg-zinc-50 text-black font-bold text-sm px-4 py-3.5 rounded-2xl border-2 border-zinc-300 outline-none focus:border-black transition-all"
-              />
+              >
+                <option value="">-- Custom / Walk-in Customer --</option>
+                {customers.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name} {c.phone ? `(${c.phone})` : ''} - {c.location}
+                  </option>
+                ))}
+              </select>
             </div>
 
-            <div>
-              <label className="text-xs font-black uppercase text-zinc-800 block mb-2 flex items-center space-x-1.5">
-                <Phone className="w-4 h-4 stroke-[1.5]" />
-                <span>Mobile Number</span>
-              </label>
-              <input
-                type="text"
-                value={customerPhone}
-                onChange={(e) => setCustomerPhone(e.target.value)}
-                placeholder="+91 98765 43210"
-                className="w-full bg-zinc-50 text-black font-bold text-sm px-4 py-3.5 rounded-2xl border-2 border-zinc-300 outline-none focus:border-black transition-all"
-              />
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div>
+                <label className="text-xs font-black uppercase text-zinc-800 block mb-2 flex items-center space-x-1.5">
+                  <User className="w-4 h-4 stroke-[1.5]" />
+                  <span>Customer Name *</span>
+                </label>
+                <input
+                  type="text"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  placeholder="Customer or Company Name"
+                  className="w-full bg-zinc-50 text-black font-bold text-sm px-4 py-3.5 rounded-2xl border-2 border-zinc-300 outline-none focus:border-black transition-all"
+                />
+              </div>
 
-            <div>
-              <label className="text-xs font-black uppercase text-zinc-800 block mb-2 flex items-center space-x-1.5">
-                <MapPin className="w-4 h-4 stroke-[1.5]" />
-                <span>Location / Address *</span>
-              </label>
-              <input
-                type="text"
-                value={customerLocation}
-                onChange={(e) => setCustomerLocation(e.target.value)}
-                placeholder="City / Address"
-                className="w-full bg-zinc-50 text-black font-bold text-sm px-4 py-3.5 rounded-2xl border-2 border-zinc-300 outline-none focus:border-black transition-all"
-              />
-            </div>
+              <div>
+                <label className="text-xs font-black uppercase text-zinc-800 block mb-2 flex items-center space-x-1.5">
+                  <Phone className="w-4 h-4 stroke-[1.5]" />
+                  <span>Mobile Number</span>
+                </label>
+                <input
+                  type="text"
+                  value={customerPhone}
+                  onChange={(e) => setCustomerPhone(e.target.value)}
+                  placeholder="+91 98765 43210"
+                  className="w-full bg-zinc-50 text-black font-bold text-sm px-4 py-3.5 rounded-2xl border-2 border-zinc-300 outline-none focus:border-black transition-all"
+                />
+              </div>
 
-            <div>
-              <label className="text-xs font-black uppercase text-zinc-800 block mb-2 flex items-center space-x-1.5">
-                <FileText className="w-4 h-4 stroke-[1.5]" />
-                <span>GSTIN (Optional)</span>
-              </label>
-              <input
-                type="text"
-                value={customerGstin}
-                onChange={(e) => setCustomerGstin(e.target.value)}
-                placeholder="32ABCDE1234F1Z5"
-                className="w-full bg-zinc-50 text-black font-mono font-bold text-sm px-4 py-3.5 rounded-2xl border-2 border-zinc-300 outline-none focus:border-black transition-all"
-              />
+              <div>
+                <label className="text-xs font-black uppercase text-zinc-800 block mb-2 flex items-center space-x-1.5">
+                  <MapPin className="w-4 h-4 stroke-[1.5]" />
+                  <span>Location / Address *</span>
+                </label>
+                <input
+                  type="text"
+                  value={customerLocation}
+                  onChange={(e) => setCustomerLocation(e.target.value)}
+                  placeholder="City / Address"
+                  className="w-full bg-zinc-50 text-black font-bold text-sm px-4 py-3.5 rounded-2xl border-2 border-zinc-300 outline-none focus:border-black transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-black uppercase text-zinc-800 block mb-2 flex items-center space-x-1.5">
+                  <FileText className="w-4 h-4 stroke-[1.5]" />
+                  <span>GSTIN (Optional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={customerGstin}
+                  onChange={(e) => setCustomerGstin(e.target.value)}
+                  placeholder="32ABCDE1234F1Z5"
+                  className="w-full bg-zinc-50 text-black font-mono font-bold text-sm px-4 py-3.5 rounded-2xl border-2 border-zinc-300 outline-none focus:border-black transition-all"
+                />
+              </div>
             </div>
           </div>
 
@@ -724,6 +756,27 @@ export default function StandardizedPOSDashboardPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Settings Icon fallback
+function SettingsIcon(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
   );
 }
 
