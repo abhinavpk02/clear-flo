@@ -45,10 +45,10 @@ interface CartItem {
   quantity: number;
 }
 
-export default function SizedUpPOSDashboardPage() {
+export default function StandardizedPOSDashboardPage() {
   const router = useRouter();
 
-  // 7-Column Desktop Navigation (Sized Up)
+  // Navigation Modules (Standardized)
   const modules = [
     {
       id: 'pos',
@@ -56,7 +56,7 @@ export default function SizedUpPOSDashboardPage() {
       href: '/',
       icon: ShoppingCart,
       primary: true,
-      desc: '1-2-3 Billing Terminal',
+      desc: 'Billing Terminal',
     },
     {
       id: 'invoices',
@@ -64,7 +64,7 @@ export default function SizedUpPOSDashboardPage() {
       href: '/invoices',
       icon: Receipt,
       primary: false,
-      desc: 'Print & GST Editor',
+      desc: 'Sales & GST Bills',
     },
     {
       id: 'accounts',
@@ -72,7 +72,7 @@ export default function SizedUpPOSDashboardPage() {
       href: '/accounting',
       icon: TrendingUp,
       primary: false,
-      desc: 'Tally P&L Ledger',
+      desc: 'Profit & Loss',
     },
     {
       id: 'payroll',
@@ -80,7 +80,7 @@ export default function SizedUpPOSDashboardPage() {
       href: '/payroll',
       icon: Users,
       primary: false,
-      desc: 'Attendance & Salary',
+      desc: 'Salaries & Attendance',
     },
     {
       id: 'tax',
@@ -88,7 +88,7 @@ export default function SizedUpPOSDashboardPage() {
       href: '/settings',
       icon: Percent,
       primary: false,
-      desc: '18% Intra-State Filing',
+      desc: '18% GST Compliance',
     },
     {
       id: 'qr',
@@ -96,7 +96,7 @@ export default function SizedUpPOSDashboardPage() {
       href: '/settings',
       icon: QrCode,
       primary: false,
-      desc: 'UPI Payment Setup',
+      desc: 'UPI Payment QR',
     },
     {
       id: 'stock',
@@ -104,27 +104,27 @@ export default function SizedUpPOSDashboardPage() {
       href: '/stock',
       icon: PackageCheck,
       primary: false,
-      desc: 'Detergent Stock & Cans',
+      desc: 'Inventory Control',
     },
   ];
 
-  // POS Catalog State
+  // POS State
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
 
-  // Step 1: Customer Details
+  // Step 1: Customer
   const [customerName, setCustomerName] = useState('Walk-in Customer');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerLocation, setCustomerLocation] = useState('Kochi, Kerala');
   const [customerGstin, setCustomerGstin] = useState('');
   const [orderType, setOrderType] = useState<'DELIVERY' | 'PICKUP'>('DELIVERY');
 
-  // Step 2: Product Selection / Cart
+  // Step 2: Cart
   const [cart, setCart] = useState<CartItem[]>([]);
 
-  // Step 3: Checkout / Payment
+  // Step 3: Payment
   const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'CASH' | 'BANK_TRANSFER' | 'CREDIT'>('UPI');
   const [submitting, setSubmitting] = useState(false);
 
@@ -218,7 +218,6 @@ export default function SizedUpPOSDashboardPage() {
     }
   };
 
-  // Quick Customer Presets
   const applyPresetCustomer = (preset: { name: string; location: string; gstin?: string }) => {
     setCustomerName(preset.name);
     setCustomerLocation(preset.location);
@@ -237,14 +236,14 @@ export default function SizedUpPOSDashboardPage() {
 
   return (
     <div className="space-y-10 text-black bg-zinc-50 min-h-screen p-2 sm:p-6">
-      {/* SIZED UP MODULES NAVIGATION (STRICT B&W) */}
+      {/* MODULE NAVIGATION */}
       <div className="space-y-4">
         <div className="flex justify-between items-center px-1">
           <h2 className="text-sm font-black uppercase text-zinc-600 tracking-wider">
-            ClearFlo Navigation & Modules
+            Modules
           </h2>
           <span className="text-sm font-mono font-black text-black border-2 border-black bg-white px-3 py-1 rounded-full shadow-sm">
-            Kerala 18% GST Compliant
+            18% GST Compliant
           </span>
         </div>
 
@@ -280,24 +279,24 @@ export default function SizedUpPOSDashboardPage() {
 
       <hr className="border-2 border-zinc-200" />
 
-      {/* SIZED UP POS WORKFLOW: STEP 1 -> STEP 2 -> STEP 3 */}
+      {/* POS WORKFLOW: STEP 1 -> STEP 2 -> STEP 3 */}
       <div className="space-y-8">
-        {/* PROMINENT HEADER BAR */}
+        {/* HEADER BAR */}
         <div className="flex items-center justify-between bg-black text-white p-8 rounded-3xl shadow-xl">
           <div className="flex items-center space-x-4">
             <div className="w-14 h-14 rounded-2xl bg-white text-black flex items-center justify-center shadow-lg">
               <ShoppingCart className="w-8 h-8 stroke-[1.5]" />
             </div>
             <div>
-              <h1 className="font-black text-2xl tracking-tight">Quick POS Billing Terminal</h1>
+              <h1 className="font-black text-2xl tracking-tight">Quick POS</h1>
               <p className="text-sm text-zinc-400 font-semibold">
-                Step-by-step POS: Customer Details → Select Products & Qty → Complete Checkout
+                Customer Details → Select Products → Checkout
               </p>
             </div>
           </div>
           <div className="flex items-center space-x-4 text-base font-mono font-bold">
             <span className="bg-zinc-800 text-white px-4 py-2.5 rounded-2xl border border-zinc-700">
-              Cart: {cart.length} item{cart.length === 1 ? '' : 's'}
+              Items: {cart.length}
             </span>
             <span className="bg-white text-black px-5 py-2.5 rounded-2xl font-black text-lg shadow">
               Total: {formatRupees(gst.totalInPaise)}
@@ -305,7 +304,7 @@ export default function SizedUpPOSDashboardPage() {
           </div>
         </div>
 
-        {/* STEP 1: SELECT CUSTOMER & ORDER DETAILS (SIZED UP) */}
+        {/* STEP 1: CUSTOMER DETAILS */}
         <div className="bg-white border-2 border-black rounded-3xl p-8 shadow-sm space-y-6">
           <div className="flex items-center justify-between pb-4 border-b-2 border-zinc-200">
             <div className="flex items-center space-x-4">
@@ -314,14 +313,14 @@ export default function SizedUpPOSDashboardPage() {
               </div>
               <div>
                 <h2 className="font-black text-xl text-black flex items-center space-x-2">
-                  <span>Step 1: Select Customer & Order Details</span>
+                  <span>Customer Details</span>
                   <User className="w-5 h-5 text-zinc-600 stroke-[1.5]" />
                 </h2>
-                <p className="text-sm text-zinc-500 font-medium">Enter or pick customer details for the invoice</p>
+                <p className="text-sm text-zinc-500 font-medium">Select or enter customer details</p>
               </div>
             </div>
 
-            {/* Quick Presets */}
+            {/* Presets */}
             <div className="hidden lg:flex items-center space-x-2">
               <span className="text-xs uppercase font-black text-zinc-400">Presets:</span>
               <button
@@ -358,7 +357,7 @@ export default function SizedUpPOSDashboardPage() {
                 type="text"
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
-                placeholder="e.g. Walk-in Customer / Company Name"
+                placeholder="Customer or Company Name"
                 className="w-full bg-zinc-50 text-black font-bold text-sm px-4 py-3.5 rounded-2xl border-2 border-zinc-300 outline-none focus:border-black transition-all"
               />
             </div>
@@ -380,13 +379,13 @@ export default function SizedUpPOSDashboardPage() {
             <div>
               <label className="text-xs font-black uppercase text-zinc-800 block mb-2 flex items-center space-x-1.5">
                 <MapPin className="w-4 h-4 stroke-[1.5]" />
-                <span>Delivery Location / Address *</span>
+                <span>Location / Address *</span>
               </label>
               <input
                 type="text"
                 value={customerLocation}
                 onChange={(e) => setCustomerLocation(e.target.value)}
-                placeholder="e.g. Kalamassery, Kochi"
+                placeholder="City / Address"
                 className="w-full bg-zinc-50 text-black font-bold text-sm px-4 py-3.5 rounded-2xl border-2 border-zinc-300 outline-none focus:border-black transition-all"
               />
             </div>
@@ -407,7 +406,7 @@ export default function SizedUpPOSDashboardPage() {
           </div>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pt-2 gap-4">
-            <span className="text-xs font-black uppercase text-zinc-700">Fulfillment Mode:</span>
+            <span className="text-xs font-black uppercase text-zinc-700">Order Mode:</span>
             <div className="flex bg-zinc-100 p-1.5 rounded-2xl border-2 border-zinc-300 space-x-2">
               <button
                 type="button"
@@ -419,7 +418,7 @@ export default function SizedUpPOSDashboardPage() {
                 }`}
               >
                 <Truck className="w-5 h-5 stroke-[1.5]" />
-                <span>Delivery Order</span>
+                <span>Delivery</span>
               </button>
               <button
                 type="button"
@@ -431,13 +430,13 @@ export default function SizedUpPOSDashboardPage() {
                 }`}
               >
                 <ShoppingBag className="w-5 h-5 stroke-[1.5]" />
-                <span>Store Pickup</span>
+                <span>Pickup</span>
               </button>
             </div>
           </div>
         </div>
 
-        {/* STEP 2: SELECT PRODUCT & QUANTITY (SIZED UP) */}
+        {/* STEP 2: PRODUCT CATALOG */}
         <div className="bg-white border-2 border-black rounded-3xl p-8 shadow-sm space-y-6">
           <div className="flex items-center justify-between pb-4 border-b-2 border-zinc-200">
             <div className="flex items-center space-x-4">
@@ -446,10 +445,10 @@ export default function SizedUpPOSDashboardPage() {
               </div>
               <div>
                 <h2 className="font-black text-xl text-black flex items-center space-x-2">
-                  <span>Step 2: Select Products & Quantity</span>
+                  <span>Product Catalog</span>
                   <PackageCheck className="w-5 h-5 text-zinc-600 stroke-[1.5]" />
                 </h2>
-                <p className="text-sm text-zinc-500 font-medium">Add liquid detergent products to cart and adjust quantities</p>
+                <p className="text-sm text-zinc-500 font-medium">Add products to order and select quantities</p>
               </div>
             </div>
 
@@ -460,18 +459,18 @@ export default function SizedUpPOSDashboardPage() {
                 className="text-sm font-black text-zinc-600 hover:text-black flex items-center space-x-1.5 underline"
               >
                 <Trash2 className="w-4 h-4 stroke-[1.5]" />
-                <span>Clear Cart ({cart.length})</span>
+                <span>Clear Order ({cart.length})</span>
               </button>
             )}
           </div>
 
-          {/* Search & Category Chips (Sized Up) */}
+          {/* Search & Categories */}
           <div className="space-y-4">
             <div className="relative w-full">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 stroke-[1.5]" />
               <input
                 type="text"
-                placeholder="Search products (car wash, dishwash, floor cleaner, fabric softener, hand wash...)"
+                placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-zinc-50 text-black placeholder-zinc-400 text-sm font-bold pl-12 pr-4 py-4 rounded-2xl border-2 border-zinc-300 outline-none focus:border-black transition-all shadow-inner"
@@ -495,10 +494,10 @@ export default function SizedUpPOSDashboardPage() {
             </div>
           </div>
 
-          {/* Sized Up Product Cards Grid */}
+          {/* Product Cards Grid */}
           {loading ? (
             <div className="py-16 text-center text-zinc-500 font-bold text-sm">
-              Loading detergent products...
+              Loading products...
             </div>
           ) : filteredProducts.length === 0 ? (
             <div className="bg-zinc-50 p-12 rounded-2xl border-2 border-zinc-300 text-center text-zinc-500 font-bold text-sm">
@@ -521,19 +520,16 @@ export default function SizedUpPOSDashboardPage() {
                         : 'border-zinc-300 hover:border-black hover:shadow-md'
                     }`}
                   >
-                    {/* Quantity Badge */}
                     {inCartQty > 0 && (
                       <span className="absolute top-3 right-3 bg-black text-white font-black text-xs px-2.5 py-0.5 rounded-full shadow">
-                        {inCartQty} in cart
+                        {inCartQty}
                       </span>
                     )}
 
-                    {/* Sized Up Dynamic Icon Box */}
                     <div className="w-14 h-14 rounded-2xl bg-black text-white flex items-center justify-center mb-3 transition-transform group-hover:scale-110 shadow-md">
                       <DynamicIcon className="w-7 h-7 stroke-[1.5]" />
                     </div>
 
-                    {/* Title & Unit */}
                     <div className="w-full space-y-1 mb-4">
                       <span className="text-xs font-black uppercase text-zinc-400 block">
                         {product.unit}
@@ -543,7 +539,6 @@ export default function SizedUpPOSDashboardPage() {
                       </h3>
                     </div>
 
-                    {/* Price & Actions */}
                     <div className="w-full pt-3 border-t-2 border-zinc-200 flex items-center justify-between">
                       <span className="text-sm font-black font-mono text-black">
                         {formatRupees(product.priceInPaise)}
@@ -575,7 +570,7 @@ export default function SizedUpPOSDashboardPage() {
                             addToCart(product);
                           }}
                           className="w-8 h-8 rounded-xl bg-black hover:bg-zinc-800 text-white flex items-center justify-center transition-transform hover:scale-105 shadow"
-                          title="Add product"
+                          title="Add"
                         >
                           <Plus className="w-4 h-4 stroke-[2.5]" />
                         </button>
@@ -587,12 +582,12 @@ export default function SizedUpPOSDashboardPage() {
             </div>
           )}
 
-          {/* Sized Up Cart Items Summary Table */}
+          {/* Cart Summary */}
           {cart.length > 0 && (
             <div className="mt-6 border-2 border-black rounded-2xl p-6 bg-zinc-50 space-y-4 shadow-inner">
               <h3 className="font-black text-sm uppercase text-black tracking-wider flex items-center space-x-2">
                 <ShoppingCart className="w-5 h-5 stroke-[1.5]" />
-                <span>Cart Summary & Quantities ({cart.length} unique items)</span>
+                <span>Order Summary ({cart.length} items)</span>
               </h3>
 
               <div className="divide-y-2 divide-zinc-200">
@@ -635,7 +630,7 @@ export default function SizedUpPOSDashboardPage() {
           )}
         </div>
 
-        {/* STEP 3: CHECKOUT & FINAL PAYMENT (SIZED UP) */}
+        {/* STEP 3: CHECKOUT & PAYMENT */}
         <div className="bg-white border-2 border-black rounded-3xl p-8 shadow-sm space-y-8">
           <div className="flex items-center justify-between pb-4 border-b-2 border-zinc-200">
             <div className="flex items-center space-x-4">
@@ -644,31 +639,30 @@ export default function SizedUpPOSDashboardPage() {
               </div>
               <div>
                 <h2 className="font-black text-xl text-black flex items-center space-x-2">
-                  <span>Step 3: Checkout & Complete Billing</span>
+                  <span>Checkout & Payment</span>
                   <CreditCard className="w-5 h-5 text-zinc-600 stroke-[1.5]" />
                 </h2>
-                <p className="text-sm text-zinc-500 font-medium">Select payment method and finalize 18% GST bill</p>
+                <p className="text-sm text-zinc-500 font-medium">Select payment method and generate invoice</p>
               </div>
             </div>
 
             <div className="text-right font-mono">
-              <span className="text-xs uppercase font-black text-zinc-500 block">Total Due:</span>
+              <span className="text-xs uppercase font-black text-zinc-500 block">Total:</span>
               <span className="text-2xl font-black text-black">{formatRupees(gst.totalInPaise)}</span>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-            {/* Left: Sized Up Payment Method Grid */}
             <div className="space-y-4">
               <label className="text-sm font-black uppercase text-black block">
                 Payment Method:
               </label>
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { id: 'UPI', label: 'UPI / QR Payment', icon: QrCode },
-                  { id: 'CASH', label: 'Cash Payment', icon: BanknoteIcon },
+                  { id: 'UPI', label: 'UPI / QR', icon: QrCode },
+                  { id: 'CASH', label: 'Cash', icon: BanknoteIcon },
                   { id: 'BANK_TRANSFER', label: 'Bank Transfer', icon: Building2 },
-                  { id: 'CREDIT', label: 'Customer Credit', icon: CreditCard },
+                  { id: 'CREDIT', label: 'Credit', icon: CreditCard },
                 ].map((pm) => {
                   const Icon = pm.icon;
                   return (
@@ -690,23 +684,22 @@ export default function SizedUpPOSDashboardPage() {
               </div>
             </div>
 
-            {/* Right: Sized Up Bill Breakdown & Big Action Button */}
             <div className="bg-zinc-50 p-6 rounded-2xl border-2 border-zinc-300 space-y-4 text-sm">
               <div className="flex justify-between text-zinc-700 font-semibold">
-                <span>Items Subtotal:</span>
+                <span>Subtotal:</span>
                 <span className="font-mono font-bold text-black text-base">{formatRupees(gst.subtotalInPaise)}</span>
               </div>
               <div className="flex justify-between text-zinc-700 font-semibold">
-                <span>CGST (9% Kerala):</span>
+                <span>CGST (9%):</span>
                 <span className="font-mono font-bold text-black text-base">{formatRupees(gst.cgstInPaise)}</span>
               </div>
               <div className="flex justify-between text-zinc-700 font-semibold">
-                <span>SGST (9% Kerala):</span>
+                <span>SGST (9%):</span>
                 <span className="font-mono font-bold text-black text-base">{formatRupees(gst.sgstInPaise)}</span>
               </div>
               <hr className="border-2 border-zinc-300" />
               <div className="flex justify-between font-black text-xl text-black">
-                <span>Total Amount Due:</span>
+                <span>Total Amount:</span>
                 <span className="font-mono text-2xl">{formatRupees(gst.totalInPaise)}</span>
               </div>
 
@@ -717,13 +710,13 @@ export default function SizedUpPOSDashboardPage() {
                 className="w-full py-5 px-8 rounded-2xl bg-black hover:bg-zinc-800 disabled:opacity-30 text-white font-black text-base uppercase tracking-wider shadow-xl transition-all flex items-center justify-center space-x-3 mt-6"
               >
                 <CheckCircle2 className="w-6 h-6 stroke-[1.5]" />
-                <span>{submitting ? 'Processing Invoice...' : 'Complete Checkout & Print A4 Invoice'}</span>
+                <span>{submitting ? 'Processing...' : 'Complete Checkout & Print A4 Invoice'}</span>
                 <ArrowRight className="w-5 h-5 stroke-[1.5]" />
               </button>
 
               {cart.length === 0 && (
                 <p className="text-xs text-center text-zinc-500 font-bold">
-                  ⚠️ Please select products in Step 2 to enable checkout.
+                  ⚠️ Select products in Step 2 to checkout.
                 </p>
               )}
             </div>
@@ -734,7 +727,6 @@ export default function SizedUpPOSDashboardPage() {
   );
 }
 
-// Fallback icon for Cash Payment
 function BanknoteIcon(props: any) {
   return (
     <svg

@@ -36,23 +36,23 @@ export default function ClearFloLayout({ children }: { children: React.ReactNode
     {
       id: 1,
       title: 'Low Stock Alert',
-      desc: 'ClearFlo Top Load 5L is down to 12 cans left in warehouse.',
+      desc: 'Top Load Detergent 5L is down to 12 cans.',
       time: '10m ago',
     },
     {
       id: 2,
       title: 'Payment Pending',
-      desc: 'Royal Laundry - ₹4,800.00 pending for Invoice #INV-2026-0002.',
+      desc: 'Invoice #INV-2026-0002 has ₹4,800.00 pending.',
       time: '1h ago',
     },
   ];
 
   return (
     <div className="min-h-screen bg-white font-sans flex text-black">
-      {/* FIXED LEFT SIDEBAR (Sized Up & Perfectly Aligned) */}
+      {/* FIXED LEFT SIDEBAR */}
       <aside className="w-72 bg-black text-white flex flex-col justify-between fixed inset-y-0 left-0 z-40 border-r border-zinc-900 shadow-2xl">
         <div className="p-6 space-y-8">
-          {/* Logo Header: Bold White "ClearFlo" */}
+          {/* Logo Header: ClearFlo */}
           <Link href="/" className="flex items-center space-x-3.5 group block">
             <div className="w-12 h-12 rounded-2xl bg-white text-black flex items-center justify-center font-black shadow-lg group-hover:scale-105 transition-transform">
               <Droplet className="w-7 h-7 stroke-[1.5]" />
@@ -62,7 +62,7 @@ export default function ClearFloLayout({ children }: { children: React.ReactNode
                 ClearFlo
               </h1>
               <span className="text-xs text-zinc-400 font-bold uppercase tracking-wider block -mt-0.5">
-                Detergent POS & Tax
+                POS & Accounting
               </span>
             </div>
           </Link>
@@ -70,7 +70,7 @@ export default function ClearFloLayout({ children }: { children: React.ReactNode
           {/* Vertical Quick Access Tabs */}
           <div className="space-y-2">
             <span className="text-xs font-black uppercase text-zinc-500 tracking-wider block px-3 mb-2">
-              Quick Access
+              Navigation
             </span>
             <nav className="space-y-1.5">
               {quickNav.map((item) => {
@@ -103,16 +103,16 @@ export default function ClearFloLayout({ children }: { children: React.ReactNode
 
         {/* Sidebar Footer Info */}
         <div className="p-4 m-4 bg-zinc-950 rounded-2xl border border-zinc-900 text-center space-y-1">
-          <p className="text-xs font-black text-zinc-200">ClearFlo Liquid Detergents</p>
-          <p className="text-xs text-zinc-400 font-mono font-bold">Kerala GST: 32ABCDE1234F1Z5</p>
+          <p className="text-xs font-black text-zinc-200">ClearFlo Business POS</p>
+          <p className="text-xs text-zinc-400 font-mono font-bold">GSTIN: 32ABCDE1234F1Z5</p>
         </div>
       </aside>
 
       {/* MAIN CONTENT AREA */}
       <div className="flex-1 pl-72 flex flex-col min-h-screen">
-        {/* HEADER BAR (Sized Up & Aligned) */}
+        {/* HEADER BAR */}
         <header className="h-20 bg-white border-b-2 border-zinc-200 px-8 flex items-center justify-between sticky top-0 z-30">
-          {/* Top Left: Notification Bell Icon + Dropdown */}
+          {/* Notification Bell Dropdown */}
           <div className="relative">
             <button
               onClick={() => setIsNotifOpen(!isNotifOpen)}
@@ -123,15 +123,14 @@ export default function ClearFloLayout({ children }: { children: React.ReactNode
               <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full bg-black ring-2 ring-white" />
             </button>
 
-            {/* Notification Dropdown */}
             {isNotifOpen && (
               <div className="absolute left-0 mt-3 w-88 bg-white border-2 border-black rounded-3xl shadow-2xl p-5 z-50 space-y-4 text-black">
                 <div className="flex justify-between items-center pb-2 border-b border-zinc-200">
                   <span className="font-black text-xs text-black uppercase tracking-wider">
-                    Alerts & Notifications
+                    Notifications
                   </span>
                   <span className="text-xs font-bold text-white bg-black px-2.5 py-0.5 rounded-full">
-                    2 Active
+                    2 New
                   </span>
                 </div>
 
@@ -156,7 +155,7 @@ export default function ClearFloLayout({ children }: { children: React.ReactNode
             )}
           </div>
 
-          {/* Center: Wide White Pill-Shaped Search Bar */}
+          {/* Search Bar */}
           <div className="flex-1 max-w-xl mx-8">
             <div className="relative w-full">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 stroke-[1.5]" />
@@ -164,18 +163,18 @@ export default function ClearFloLayout({ children }: { children: React.ReactNode
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search Modules or Customers..."
+                placeholder="Search..."
                 className="w-full bg-white text-black placeholder-zinc-400 text-sm font-semibold pl-12 pr-4 py-3 rounded-full border-2 border-zinc-300 shadow-sm focus:outline-none focus:border-black transition-all"
               />
             </div>
           </div>
 
-          {/* Top Right: Refresh Icon & Logout Link */}
+          {/* Refresh & Logout Links */}
           <div className="flex items-center space-x-5">
             <button
               onClick={() => window.location.reload()}
               className="p-3 rounded-2xl bg-zinc-100 hover:bg-zinc-200 text-black transition-colors border-2 border-zinc-300"
-              title="Refresh System"
+              title="Refresh"
             >
               <RotateCw className="w-5 h-5 stroke-[1.5]" />
             </button>
