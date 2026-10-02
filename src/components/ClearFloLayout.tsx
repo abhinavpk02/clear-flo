@@ -51,7 +51,7 @@ export default function ClearFloLayout({ children }: { children: React.ReactNode
   return (
     <div className="min-h-screen bg-white font-sans flex text-black">
       {/* FIXED LEFT SIDEBAR */}
-      <aside className="w-72 bg-black text-white flex flex-col justify-between fixed inset-y-0 left-0 z-40 border-r border-zinc-900 shadow-2xl">
+      <aside className="print:hidden w-72 bg-black text-white flex flex-col justify-between fixed inset-y-0 left-0 z-40 border-r border-zinc-900 shadow-2xl">
         <div className="p-6 space-y-8">
           {/* Logo Header: ClearFlo */}
           <Link href="/" className="flex items-center space-x-3.5 group block">
@@ -110,9 +110,9 @@ export default function ClearFloLayout({ children }: { children: React.ReactNode
       </aside>
 
       {/* MAIN CONTENT AREA */}
-      <div className="flex-1 pl-72 flex flex-col min-h-screen">
+      <div className="flex-1 pl-72 print:pl-0 flex flex-col min-h-screen print:min-h-0">
         {/* HEADER BAR */}
-        <header className="h-20 bg-white border-b-2 border-zinc-200 px-8 flex items-center justify-between sticky top-0 z-30">
+        <header className="print:hidden h-20 bg-white border-b-2 border-zinc-200 px-8 flex items-center justify-between sticky top-0 z-30">
           {/* Notification Bell Dropdown */}
           <div className="relative">
             <button
@@ -191,7 +191,7 @@ export default function ClearFloLayout({ children }: { children: React.ReactNode
         </header>
 
         {/* Content Container */}
-        <main className="flex-1 p-8 bg-zinc-50">{children}</main>
+        <main className="flex-1 p-8 print:p-0 bg-zinc-50 print:bg-white">{children}</main>
       </div>
     </div>
   );

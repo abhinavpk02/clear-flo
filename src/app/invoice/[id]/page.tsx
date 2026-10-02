@@ -10,6 +10,7 @@ import {
   ArrowLeft,
   Plus,
   Trash2,
+  Download,
 } from 'lucide-react';
 import { formatRupees, calculateKeralaGST, toPaise, toRupees } from '@/lib/money';
 
@@ -69,6 +70,17 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
   useEffect(() => {
     fetchInvoiceAndSettings();
   }, [id]);
+
+  useEffect(() => {
+    if (!loading && invoice && typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      if (searchParams.get('download') === 'true' || searchParams.get('print') === 'true') {
+        setTimeout(() => {
+          window.print();
+        }, 500);
+      }
+    }
+  }, [loading, invoice]);
 
   const fetchInvoiceAndSettings = async () => {
     try {
@@ -212,11 +224,11 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
       <div className="print:hidden p-4 rounded-3xl border border-black bg-white flex flex-wrap items-center justify-between gap-4 shadow-sm">
         <div className="flex items-center space-x-3">
           <Link
-            href="/"
+            href="/invoices"
             className="px-4 py-2 rounded-2xl text-xs font-bold flex items-center space-x-2 transition-colors bg-zinc-100 hover:bg-zinc-200 text-black border border-zinc-300"
           >
             <ArrowLeft className="w-4 h-4 stroke-[1.5]" />
-            <span>Back to POS</span>
+            <span>All Invoices</span>
           </Link>
           <div className="h-5 w-px bg-zinc-300" />
           <span className="font-black text-sm text-black">
@@ -259,15 +271,23 @@ export default function InvoicePage({ params }: { params: Promise<{ id: string }
               </button>
               <button
                 onClick={handlePrint}
-                className="px-5 py-2.5 rounded-2xl bg-black hover:bg-zinc-800 text-white font-black text-xs uppercase tracking-wider flex items-center space-x-2 shadow transition-all"
+                className="px-5 py-2.5 rounded-2xl bg-zinc-100 hover:bg-zinc-200 text-black border border-black font-black text-xs uppercase tracking-wider flex items-center space-x-2 transition-all"
               >
                 <Printer className="w-4 h-4 stroke-[1.5]" />
-                <span>Print A4 Invoice</span>
+                <span>Print A4 Bill</span>
+              </button>
+              <button
+                onClick={handlePrint}
+                className="px-5 py-2.5 rounded-2xl bg-black hover:bg-zinc-800 text-white font-black text-xs uppercase tracking-wider flex items-center space-x-2 shadow transition-all"
+              >
+                <Download className="w-4 h-4 stroke-[1.5]" />
+                <span>Download PDF Bill</span>
               </button>
             </>
           )}
         </div>
       </div>
+
 
       {/* A4 PRINTABLE SHEET CONTAINER (Pixel-Perfect A4 Sheet: 210mm width) */}
       <div className="flex justify-center">

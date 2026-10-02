@@ -9,6 +9,7 @@ import {
   Eye,
   Truck,
   ShoppingBag,
+  Download,
 } from 'lucide-react';
 import { formatRupees } from '@/lib/money';
 
@@ -127,7 +128,7 @@ export default function InvoicesListPage() {
                   <th className="p-4">Customer</th>
                   <th className="p-4">Order Mode</th>
                   <th className="p-4 text-right">Total (Incl. 18% GST)</th>
-                  <th className="p-4 text-center">Action</th>
+                  <th className="p-4 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-200 font-semibold text-black">
@@ -159,13 +160,22 @@ export default function InvoicesListPage() {
                       {formatRupees(inv.totalInPaise)}
                     </td>
                     <td className="p-4 text-center">
-                      <Link
-                        href={`/invoice/${inv.id}`}
-                        className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl font-extrabold text-xs bg-black text-white hover:bg-zinc-800 transition-all shadow-sm"
-                      >
-                        <Eye className="w-3.5 h-3.5 stroke-[1.5]" />
-                        <span>View A4 Bill</span>
-                      </Link>
+                      <div className="flex items-center justify-center space-x-2">
+                        <Link
+                          href={`/invoice/${inv.id}`}
+                          className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-xl font-bold text-xs bg-zinc-100 hover:bg-zinc-200 text-black border border-zinc-300 transition-all"
+                        >
+                          <Eye className="w-3.5 h-3.5 stroke-[1.5]" />
+                          <span>View</span>
+                        </Link>
+                        <Link
+                          href={`/invoice/${inv.id}?download=true`}
+                          className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-xl font-black text-xs bg-black text-white hover:bg-zinc-800 transition-all shadow-sm"
+                        >
+                          <Download className="w-3.5 h-3.5 stroke-[1.5]" />
+                          <span>Download PDF</span>
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -177,3 +187,4 @@ export default function InvoicesListPage() {
     </div>
   );
 }
+
