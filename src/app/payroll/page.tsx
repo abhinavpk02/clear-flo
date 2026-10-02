@@ -8,6 +8,8 @@ import {
   CheckCircle,
   XCircle,
   Clock,
+  Loader2,
+  Plus,
 } from 'lucide-react';
 import { formatRupees, toPaise } from '@/lib/money';
 
@@ -49,11 +51,14 @@ export default function PayrollPage() {
   const [empRole, setEmpRole] = useState('Production Staff');
   const [empPhone, setEmpPhone] = useState('');
   const [empSalaryRupees, setEmpSalaryRupees] = useState('');
+  const [submittingStaff, setSubmittingStaff] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   // Salary Transaction Form
   const [transType, setTransType] = useState<'PAYMENT' | 'ADVANCE' | 'DEDUCTION'>('ADVANCE');
   const [transAmountRupees, setTransAmountRupees] = useState('');
   const [transNote, setTransNote] = useState('');
+  const [submittingTrans, setSubmittingTrans] = useState(false);
 
   useEffect(() => {
     fetchPayroll();
@@ -76,29 +81,41 @@ export default function PayrollPage() {
 
   const handleCreateEmployee = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!empName || !empSalaryRupees) return;
+    if (!empName.trim()) {
+      setErrorMsg('Please enter Staff Member Name.');
+      return;
+    }
 
     try {
+      setSubmittingStaff(true);
+      setErrorMsg('');
       const res = await fetch('/api/payroll', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'CREATE_EMPLOYEE',
-          name: empName,
-          role: empRole,
-          phone: empPhone,
-          monthlySalaryInPaise: toPaise(empSalaryRupees),
+          name: empName.trim(),
+          role: empRole.trim() || 'Staff',
+          phone: empPhone.trim(),
+          monthlySalaryInPaise: toPaise(empSalaryRupees || '0'),
         }),
       });
 
+      const data = await res.json();
       if (res.ok) {
         setIsAddEmpModalOpen(false);
         setEmpName('');
+        setEmpPhone('');
         setEmpSalaryRupees('');
         fetchPayroll();
+      } else {
+        setErrorMsg(data.error || 'Failed to create staff member.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      setErrorMsg(err.message || 'Error creating staff member.');
+    } finally {
+      setSubmittingStaff(false);
     }
   };
 
@@ -122,14 +139,12 @@ export default function PayrollPage() {
     }
   };
 
-  const [submitting, setSubmitting] = useState(false);
-
   const handleSalaryTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedEmp || !transAmountRupees || submitting) return;
+    if (!selectedEmp || !transAmountRupees || submittingTrans) return;
 
     try {
-      setSubmitting(true);
+      setSubmittingTrans(true);
       const res = await fetch('/api/payroll', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -151,14 +166,14 @@ export default function PayrollPage() {
     } catch (err) {
       console.error(err);
     } finally {
-      setSubmitting(false);
+      setSubmittingTrans(false);
     }
   };
 
   const todayStr = new Date().toISOString().split('T')[0];
 
   return (
-    <div className="space-y-6 text-black">
+    <div className="space-y-6 text-black pb-12">
       {/* Sub-Section Header Bar */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border border-black bg-white p-6 rounded-3xl shadow-sm">
         <div>
@@ -172,7 +187,10 @@ export default function PayrollPage() {
         </div>
 
         <button
-          onClick={() => setIsAddEmpModalOpen(true)}
+          onClick={() => {
+            setErrorMsg('');
+            setIsAddEmpModalOpen(true);
+          }}
           className="px-5 py-3 rounded-2xl bg-black hover:bg-zinc-800 text-white font-black text-xs uppercase tracking-wider flex items-center space-x-2 shadow transition-all"
         >
           <UserPlus className="w-4 h-4 stroke-[2]" />
@@ -180,12 +198,97 @@ export default function PayrollPage() {
         </button>
       </div>
 
+      {/* Quick Add Staff Form Card */}
+      <div className="bg-white border border-black rounded-3xl p-6 shadow-sm space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-zinc-200">
+          <div className="flex items-center space-x-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-black" />
+            <h2 className="text-xs font-black uppercase text-black tracking-wider">
+              Quick Staff Member Registration
+            </h2>
+          </div>
+          <span className="text-[10px] font-extrabold text-zinc-500">
+            Instant Payroll Database Add
+          </span>
+        </div>
+
+        {errorMsg && (
+          <div className="p-3 bg-zinc-100 border border-black text-black rounded-2xl text-xs font-bold">
+            ⚠️ {errorMsg}
+          </div>
+        )}
+
+        <form onSubmit={handleCreateEmployee} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+          <div className="md:col-span-3 space-y-1">
+            <label className="text-xs font-black text-black block">Staff Name *</label>
+            <input
+              type="text"
+              required
+              placeholder="e.g. Ramesh Kumar"
+              value={empName}
+              onChange={(e) => setEmpName(e.target.value)}
+              className="w-full bg-zinc-50 text-black font-semibold text-xs px-4 py-3 rounded-2xl border border-zinc-300 outline-none focus:border-black"
+            />
+          </div>
+
+          <div className="md:col-span-3 space-y-1">
+            <label className="text-xs font-black text-black block">Role / Job Title</label>
+            <input
+              type="text"
+              placeholder="e.g. Production Supervisor"
+              value={empRole}
+              onChange={(e) => setEmpRole(e.target.value)}
+              className="w-full bg-zinc-50 text-black font-semibold text-xs px-4 py-3 rounded-2xl border border-zinc-300 outline-none focus:border-black"
+            />
+          </div>
+
+          <div className="md:col-span-2 space-y-1">
+            <label className="text-xs font-black text-black block">Phone Number</label>
+            <input
+              type="text"
+              placeholder="+91 Mobile"
+              value={empPhone}
+              onChange={(e) => setEmpPhone(e.target.value)}
+              className="w-full bg-zinc-50 text-black font-semibold text-xs px-4 py-3 rounded-2xl border border-zinc-300 outline-none focus:border-black"
+            />
+          </div>
+
+          <div className="md:col-span-2 space-y-1">
+            <label className="text-xs font-black text-black block">Monthly Base (₹)</label>
+            <input
+              type="number"
+              placeholder="e.g. 20000"
+              value={empSalaryRupees}
+              onChange={(e) => setEmpSalaryRupees(e.target.value)}
+              className="w-full bg-zinc-50 text-black font-black text-xs font-mono px-4 py-3 rounded-2xl border border-zinc-300 outline-none focus:border-black"
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <button
+              type="submit"
+              disabled={!empName.trim() || submittingStaff}
+              className="w-full py-3 rounded-2xl bg-black hover:bg-zinc-800 disabled:opacity-40 text-white text-xs font-black uppercase tracking-wider shadow transition-all flex items-center justify-center space-x-1.5 h-[46px]"
+            >
+              {submittingStaff ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <>
+                  <Plus className="w-4 h-4 stroke-[2]" />
+                  <span>Save Staff</span>
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+
       {/* Employee Cards Grid Sub-Section */}
       {loading ? (
         <div className="py-20 text-center text-zinc-400 font-bold text-sm">Loading staff database...</div>
       ) : employees.length === 0 ? (
-        <div className="p-12 text-center rounded-3xl border border-black bg-white font-semibold text-zinc-400">
-          No staff members registered yet.
+        <div className="p-12 text-center rounded-3xl border border-black bg-white font-semibold text-zinc-500">
+          No staff members registered yet. Add your first employee above!
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -211,7 +314,7 @@ export default function PayrollPage() {
                         {emp.name}
                       </h3>
                       <span className="text-xs text-black font-extrabold">{emp.role}</span>
-                      <p className="text-[11px] text-zinc-500 font-semibold mt-0.5">Ph: {emp.phone}</p>
+                      <p className="text-[11px] text-zinc-500 font-semibold mt-0.5">Ph: {emp.phone || '—'}</p>
                     </div>
                     <div className="text-right">
                       <span className="text-[10px] text-zinc-400 block font-bold uppercase">Monthly Base</span>
@@ -301,12 +404,19 @@ export default function PayrollPage() {
 
       {/* Add Employee Modal */}
       {isAddEmpModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-md p-6 rounded-3xl shadow-2xl border border-black bg-white text-black space-y-5">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-md p-6 rounded-3xl shadow-2xl border border-black bg-white text-black space-y-4">
             <h3 className="text-lg font-black">Add Staff Member</h3>
+
+            {errorMsg && (
+              <div className="p-3 bg-zinc-100 border border-black text-black rounded-2xl text-xs font-bold">
+                ⚠️ {errorMsg}
+              </div>
+            )}
+
             <form onSubmit={handleCreateEmployee} className="space-y-4">
               <div>
-                <label className="text-xs font-bold text-zinc-500 block mb-1">Full Name</label>
+                <label className="text-xs font-bold text-zinc-500 block mb-1">Full Name *</label>
                 <input
                   type="text"
                   placeholder="Employee Name"
@@ -344,7 +454,6 @@ export default function PayrollPage() {
                   value={empSalaryRupees}
                   onChange={(e) => setEmpSalaryRupees(e.target.value)}
                   className="w-full p-3 rounded-2xl border border-zinc-300 bg-zinc-50 text-black text-xs font-black font-mono outline-none focus:border-black"
-                  required
                 />
               </div>
 
@@ -358,9 +467,10 @@ export default function PayrollPage() {
                 </button>
                 <button
                   type="submit"
+                  disabled={submittingStaff}
                   className="px-5 py-2.5 rounded-xl bg-black text-white text-xs font-black shadow"
                 >
-                  Create Employee
+                  {submittingStaff ? 'Saving...' : 'Create Employee'}
                 </button>
               </div>
             </form>
@@ -370,8 +480,8 @@ export default function PayrollPage() {
 
       {/* Salary Transaction Modal */}
       {isTransModalOpen && selectedEmp && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-md p-6 rounded-3xl shadow-2xl border border-black bg-white text-black space-y-5">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-md p-6 rounded-3xl shadow-2xl border border-black bg-white text-black space-y-4">
             <h3 className="text-lg font-black">
               Salary Transaction for {selectedEmp.name}
             </h3>
@@ -437,10 +547,10 @@ export default function PayrollPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={submitting}
+                  disabled={submittingTrans}
                   className="px-5 py-2.5 rounded-xl bg-black hover:bg-zinc-800 disabled:opacity-40 text-white text-xs font-black shadow"
                 >
-                  {submitting ? 'Saving...' : 'Save Transaction'}
+                  {submittingTrans ? 'Saving...' : 'Save Transaction'}
                 </button>
               </div>
             </form>
