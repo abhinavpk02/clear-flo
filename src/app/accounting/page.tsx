@@ -95,6 +95,21 @@ export default function AccountingPage() {
     }
   };
 
+  const handleClearLedger = async () => {
+    if (!confirm('Are you sure you want to clear all ledger entries and start fresh?')) return;
+    try {
+      setLoading(true);
+      const res = await fetch('/api/admin/clear-ledger', { method: 'POST' });
+      if (res.ok) {
+        fetchAccountingData();
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6 text-black">
       {/* Sub-Section Header Bar */}
@@ -109,13 +124,23 @@ export default function AccountingPage() {
           </p>
         </div>
 
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          className="px-5 py-3 rounded-2xl bg-black hover:bg-zinc-800 text-white font-black text-xs uppercase tracking-wider flex items-center space-x-2 shadow transition-all"
-        >
-          <Plus className="w-4 h-4 stroke-[2]" />
-          <span>Record Expense / Income</span>
-        </button>
+        <div className="flex items-center space-x-3">
+          <button
+            type="button"
+            onClick={handleClearLedger}
+            className="px-4 py-3 rounded-2xl bg-zinc-100 hover:bg-zinc-200 text-black border border-zinc-300 font-extrabold text-xs transition-all"
+          >
+            Reset Ledger
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsAddModalOpen(true)}
+            className="px-5 py-3 rounded-2xl bg-black hover:bg-zinc-800 text-white font-black text-xs uppercase tracking-wider flex items-center space-x-2 shadow transition-all"
+          >
+            <Plus className="w-4 h-4 stroke-[2]" />
+            <span>Record Expense / Income</span>
+          </button>
+        </div>
       </div>
 
       {/* Financial Summary KPI Cards */}

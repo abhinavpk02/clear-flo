@@ -122,11 +122,14 @@ export default function PayrollPage() {
     }
   };
 
+  const [submitting, setSubmitting] = useState(false);
+
   const handleSalaryTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedEmp || !transAmountRupees) return;
+    if (!selectedEmp || !transAmountRupees || submitting) return;
 
     try {
+      setSubmitting(true);
       const res = await fetch('/api/payroll', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -147,6 +150,8 @@ export default function PayrollPage() {
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -432,9 +437,10 @@ export default function PayrollPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-black text-white text-xs font-black shadow"
+                  disabled={submitting}
+                  className="px-5 py-2.5 rounded-xl bg-black hover:bg-zinc-800 disabled:opacity-40 text-white text-xs font-black shadow"
                 >
-                  Save Transaction
+                  {submitting ? 'Saving...' : 'Save Transaction'}
                 </button>
               </div>
             </form>
